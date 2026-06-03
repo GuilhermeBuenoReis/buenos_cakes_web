@@ -22,7 +22,7 @@ export function CarouselIndicators({
 
 	const safeActiveIndex = clampActiveIndex(
 		activeIndex,
-		carouselImages.length - 1,
+		Math.max(0, carouselImages.length - 1),
 	);
 
 	function handleSetActiveIndex(index: number) {

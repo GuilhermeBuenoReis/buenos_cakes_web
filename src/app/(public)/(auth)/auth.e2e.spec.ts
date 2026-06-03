@@ -1,6 +1,40 @@
 import { expect, test } from "@playwright/test";
+import {
+	AUTH_SESSION_COOKIE_NAME,
+	AUTH_SESSION_COOKIE_VALUE,
+} from "../../../lib/auth/session-config";
 
 test.describe("Auth", () => {
+	test.beforeEach(async ({ context }) => {
+		await context.clearCookies();
+	});
+
+	test("keeps unauthenticated visitors on auth routes", async ({ page }) => {
+		await page.goto("/dashboard");
+
+		await expect(page).toHaveURL(/\/sign-in\?callbackUrl=%2Fdashboard$/);
+		await expect(page.getByText("Bem-vindo de volta")).toBeVisible();
+	});
+
+	test("redirects authenticated visitors away from auth routes", async ({
+		context,
+		page,
+	}) => {
+		await context.addCookies([
+			{
+				domain: "localhost",
+				name: AUTH_SESSION_COOKIE_NAME,
+				path: "/",
+				sameSite: "Lax",
+				value: AUTH_SESSION_COOKIE_VALUE,
+			},
+		]);
+
+		await page.goto("/sign-in");
+
+		await expect(page).toHaveURL(/\/dashboard$/);
+	});
+
 	test("validates sign-in and navigates to sign-up", async ({ page }) => {
 		await page.goto("/sign-in");
 

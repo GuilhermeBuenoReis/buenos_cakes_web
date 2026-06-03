@@ -3,7 +3,7 @@
 import { LogOut, MapPin, Package2, UserRound } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { useProfileCustomer } from "../_lib/profile-content";
+import { defaultProfileCustomer } from "../_lib/profile-content";
 
 const profileNavigationItems = [
 	{
@@ -27,7 +27,7 @@ const profileNavigationItems = [
 ] as const;
 
 export function ProfileSidebar() {
-	const customer = useProfileCustomer();
+	const customer = defaultProfileCustomer;
 
 	return (
 		<aside className="rounded-[2rem] border border-white/70 bg-white/92 p-5 shadow-[0_28px_70px_-50px_rgba(15,23,42,0.18)] backdrop-blur-sm sm:p-6">

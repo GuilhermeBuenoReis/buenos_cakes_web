@@ -1,9 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { authenticateUser } from "@/api/backend/auth";
+import { getBackendErrorMessage } from "@/api/backend/errors";
+import { GoogleSvg } from "@/components/google-svg";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -21,8 +26,9 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { persistAuthSession } from "@/lib/auth/browser-session";
+import { getPostSignInRedirectPath } from "@/lib/auth/session-config";
 import { cn } from "@/lib/utils";
-import { GoogleSvg } from "../../../../../components/google-svg";
 
 const signInSchema = z.object({
 	email: z.email("Informe um e-mail válido."),
@@ -40,10 +46,13 @@ export function SignInForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const {
 		formState: { errors },
 		handleSubmit,
 		register,
+		reset,
 	} = useForm<SignInFormValues>({
 		defaultValues: defaultSignInFormValues,
 		mode: "onBlur",
@@ -51,7 +60,27 @@ export function SignInForm({
 		resolver: zodResolver(signInSchema),
 	});
 
-	function handleSignInSubmit(_values: SignInFormValues) {}
+	const signInMutation = useMutation({
+		mutationFn: (values: SignInFormValues) => authenticateUser(values),
+		onSuccess: (session) => {
+			persistAuthSession(session);
+			reset(defaultSignInFormValues);
+			router.replace(
+				getPostSignInRedirectPath(searchParams.get("callbackUrl")),
+			);
+		},
+	});
+
+	const signInError = signInMutation.isError
+		? getBackendErrorMessage(
+				signInMutation.error,
+				"Não foi possível entrar agora. Tente novamente.",
+			)
+		: null;
+
+	function handleSignInSubmit(values: SignInFormValues) {
+		signInMutation.mutate(values);
+	}
 
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -106,7 +135,12 @@ export function SignInForm({
 								<FieldError errors={[errors.password]} />
 							</Field>
 							<Field>
-								<Button type="submit">Entrar</Button>
+								<Button disabled={signInMutation.isPending} type="submit">
+									{signInMutation.isPending ? "Entrando..." : "Entrar"}
+								</Button>
+								{signInError ? (
+									<FieldError errors={[{ message: signInError }]} />
+								) : null}
 								<FieldDescription className="text-center">
 									Não tem uma conta? <Link href="/sign-up">Criar conta</Link>
 								</FieldDescription>

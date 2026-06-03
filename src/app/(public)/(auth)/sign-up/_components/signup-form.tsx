@@ -1,9 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { type CreateUserRequestInput, createUser } from "@/api/backend/auth";
+import { getBackendErrorMessage } from "@/api/backend/errors";
 import { GoogleSvg } from "@/components/google-svg";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,10 +60,12 @@ export function SignupForm({
 	className,
 	...props
 }: React.ComponentProps<"form">) {
+	const router = useRouter();
 	const {
 		formState: { errors },
 		handleSubmit,
 		register,
+		reset,
 	} = useForm<SignUpFormValues>({
 		defaultValues: defaultSignUpFormValues,
 		mode: "onBlur",
@@ -67,7 +73,28 @@ export function SignupForm({
 		resolver: zodResolver(signUpSchema),
 	});
 
-	function handleSignUpSubmit(_values: SignUpFormValues) {}
+	const signUpMutation = useMutation({
+		mutationFn: (values: CreateUserRequestInput) => createUser(values),
+		onSuccess: () => {
+			reset(defaultSignUpFormValues);
+			router.push("/sign-in");
+		},
+	});
+
+	const signUpError = signUpMutation.isError
+		? getBackendErrorMessage(
+				signUpMutation.error,
+				"Não foi possível criar sua conta agora. Tente novamente.",
+			)
+		: null;
+
+	function handleSignUpSubmit(values: SignUpFormValues) {
+		signUpMutation.mutate({
+			email: values.email,
+			name: values.name,
+			password: values.password,
+		});
+	}
 
 	return (
 		<form
@@ -140,7 +167,12 @@ export function SignupForm({
 					<FieldError errors={[errors.confirmPassword]} />
 				</Field>
 				<Field>
-					<Button type="submit">Criar conta</Button>
+					<Button disabled={signUpMutation.isPending} type="submit">
+						{signUpMutation.isPending ? "Criando conta..." : "Criar conta"}
+					</Button>
+					{signUpError ? (
+						<FieldError errors={[{ message: signUpError }]} />
+					) : null}
 				</Field>
 				<FieldSeparator>Ou continue com</FieldSeparator>
 				<Field>

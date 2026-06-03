@@ -1,11 +1,50 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QueryProvider } from "@/components/application/query-provider";
 import { SignupForm } from "./signup-form";
 
+const createUserMock = vi.hoisted(() => vi.fn());
+const routerPushMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/api/backend/auth", () => ({
+	createUser: createUserMock,
+}));
+
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		push: routerPushMock,
+	}),
+}));
+
+function makeCreateUserResponse() {
+	return {
+		user: {
+			createdAt: "2026-05-27T12:00:00Z",
+			email: "joao.silva@exemplo.com",
+			id: "user-1",
+			name: "João da Silva",
+			role: "customer",
+		},
+	};
+}
+
+function renderSignupForm() {
+	return render(
+		<QueryProvider>
+			<SignupForm />
+		</QueryProvider>,
+	);
+}
+
 describe("SignupForm", () => {
+	beforeEach(() => {
+		createUserMock.mockReset();
+		routerPushMock.mockReset();
+	});
+
 	it("renders the expected fields and navigation links", () => {
-		render(<SignupForm />);
+		renderSignupForm();
 
 		expect(screen.getByLabelText("Nome completo")).toHaveAttribute(
 			"placeholder",
@@ -32,7 +71,8 @@ describe("SignupForm", () => {
 	it("validates the fields and clears the messages after valid input", async () => {
 		const user = userEvent.setup();
 
-		render(<SignupForm />);
+		createUserMock.mockResolvedValue(makeCreateUserResponse());
+		renderSignupForm();
 
 		const nameInput = screen.getByLabelText("Nome completo");
 		const emailInput = screen.getByLabelText("E-mail");
@@ -84,6 +124,15 @@ describe("SignupForm", () => {
 			expect(emailInput).toHaveAttribute("aria-invalid", "false");
 			expect(passwordInput).toHaveAttribute("aria-invalid", "false");
 			expect(confirmPasswordInput).toHaveAttribute("aria-invalid", "false");
+		});
+
+		await waitFor(() => {
+			expect(createUserMock).toHaveBeenCalledWith({
+				email: "joao.silva@exemplo.com",
+				name: "João da Silva",
+				password: "segredo123",
+			});
+			expect(routerPushMock).toHaveBeenCalledWith("/sign-in");
 		});
 	});
 });

@@ -6,8 +6,9 @@ import { formatPrice } from "@/lib/format-price";
 import { cn } from "@/lib/utils";
 import {
 	getProfileOrderItemsSummary,
+	type ProfileOrder,
 	type ProfileOrderStatusTone,
-	useProfileOrders,
+	profileOrders,
 } from "../_lib/profile-content";
 
 function getOrderStatusClassName(statusTone: ProfileOrderStatusTone) {
@@ -17,9 +18,13 @@ function getOrderStatusClassName(statusTone: ProfileOrderStatusTone) {
 	}
 }
 
-export function ProfileRecentOrders() {
-	const orders = useProfileOrders();
+interface ProfileRecentOrdersProps {
+	orders?: ProfileOrder[];
+}
 
+export function ProfileRecentOrders({
+	orders = profileOrders,
+}: ProfileRecentOrdersProps) {
 	return (
 		<section
 			className="rounded-[2rem] border border-white/70 bg-white/94 p-6 shadow-[0_28px_70px_-52px_rgba(15,23,42,0.2)] sm:p-7"
@@ -46,7 +51,7 @@ export function ProfileRecentOrders() {
 						Você ainda não confirmou nenhum pedido.
 					</p>
 					<p className="mt-2 max-w-2xl">
-						Assim que concluir um pedido no checkout, ele aparecerá aqui com
+						Assim que o backend retornar seus pedidos, eles aparecerão aqui com
 						status, total e resumo dos itens.
 					</p>
 					<Button

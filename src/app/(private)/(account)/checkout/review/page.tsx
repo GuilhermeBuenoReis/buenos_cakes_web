@@ -2,7 +2,6 @@
 
 import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { navigateToPath } from "@/lib/client-navigation";
-import { useOrderHistoryStore } from "@/stores/order-history-store";
 import { useCheckoutCustomer } from "../_context/checkout-customer-context";
 import { useCheckoutPayment } from "../_context/checkout-payment-context";
 import { useCheckoutPickup } from "../_context/checkout-pickup-context";
@@ -25,7 +24,6 @@ export default function CheckoutReviewPage() {
 	const { customerInfo } = useCheckoutCustomer();
 	const { cashChange, selectedMethod } = useCheckoutPayment();
 	const { pickupDate, pickupTime } = useCheckoutPickup();
-	const createOrder = useOrderHistoryStore((state) => state.createOrder);
 	const reviewTotal = subtotal + shipping - reviewDiscount;
 	const reviewItemCount = items.reduce(
 		(total, item) => total + item.quantity,
@@ -42,27 +40,8 @@ export default function CheckoutReviewPage() {
 			return;
 		}
 
-		const confirmedOrder = createOrder({
-			customer: customerInfo,
-			items,
-			payment: {
-				cashChange,
-				methodId: selectedPaymentMethod.id,
-				methodLabel: selectedPaymentMethod.label,
-			},
-			pickup: {
-				address: checkoutPickupLocation.address,
-				dateLabel: pickupDateLabel,
-				locationName: checkoutPickupLocation.name,
-				timeLabel: pickupTime,
-				typeLabel: "Retirada no local",
-			},
-			subtotal,
-			total: reviewTotal,
-		});
-
 		clearItems();
-		navigateToPath(`/profile#${confirmedOrder.id}`);
+		navigateToPath("/profile");
 	}
 
 	return (

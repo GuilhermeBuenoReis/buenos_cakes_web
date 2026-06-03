@@ -1,8 +1,8 @@
+import { productsSeed } from "@/api/products/seed";
 import type { Product } from "@/api/products/types";
 import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
-import db from "../../db.json";
 
-export const catalogProducts = db.products as Product[];
+export const catalogProducts = productsSeed;
 
 export function getCatalogProduct(productId: Product["id"]) {
 	const product = catalogProducts.find((item) => item.id === productId);

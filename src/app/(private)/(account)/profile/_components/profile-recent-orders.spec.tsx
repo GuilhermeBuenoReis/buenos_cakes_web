@@ -1,20 +1,28 @@
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
-import {
-	resetOrderHistoryStore,
-	seedOrderHistoryStore,
-} from "@/stores/order-history-store";
-import { createConfirmedOrderSeed } from "@/test/order-history-seed";
+import { describe, expect, it } from "vitest";
+import { createCartItemFromCatalog } from "@/test/catalog-seed";
 import { ProfileRecentOrders } from "./profile-recent-orders";
 
 describe("ProfileRecentOrders", () => {
-	beforeEach(() => {
-		resetOrderHistoryStore();
-	});
-
 	it("renders the orders table with totals, statuses and actions", () => {
-		seedOrderHistoryStore([createConfirmedOrderSeed()]);
-		render(<ProfileRecentOrders />);
+		render(
+			<ProfileRecentOrders
+				orders={[
+					{
+						dateLabel: "24 Mar, 2026",
+						id: "order-9482",
+						items: [
+							createCartItemFromCatalog("prd_8f3a92c1"),
+							createCartItemFromCatalog("prd_b71de54f", 2),
+						],
+						number: "#9482",
+						status: "Confirmado",
+						statusTone: "confirmed",
+						total: 253.9,
+					},
+				]}
+			/>,
+		);
 
 		expect(
 			screen.getByRole("heading", { name: "Pedidos Recentes" }),
@@ -30,11 +38,14 @@ describe("ProfileRecentOrders", () => {
 		expect(screen.getAllByRole("link", { name: "Detalhes" })).toHaveLength(1);
 	});
 
-	it("renders an empty state before any checkout confirmation", () => {
+	it("renders an empty state before backend orders are loaded", () => {
 		render(<ProfileRecentOrders />);
 
 		expect(
 			screen.getByText("Você ainda não confirmou nenhum pedido."),
+		).toBeVisible();
+		expect(
+			screen.getByText(/Assim que o backend retornar seus pedidos/),
 		).toBeVisible();
 		expect(
 			screen.getByRole("link", { name: "Explorar catálogo" }),

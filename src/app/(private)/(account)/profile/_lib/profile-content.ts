@@ -1,7 +1,6 @@
 "use client";
 
-import type { OrderHistoryItem } from "@/stores/order-history-store";
-import { useOrderHistoryStore } from "@/stores/order-history-store";
+import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
 
 export interface ProfileCustomer {
 	avatar: string;
@@ -42,7 +41,19 @@ export const profileAddresses = [
 	},
 ] as const;
 
-export type ProfileOrderStatusTone = OrderHistoryItem["statusTone"];
+export type ProfileOrderStatusTone = "confirmed";
+
+export interface ProfileOrder {
+	dateLabel: string;
+	id: string;
+	items: CartSheetItemData[];
+	number: string;
+	status: string;
+	statusTone: ProfileOrderStatusTone;
+	total: number;
+}
+
+export const profileOrders: ProfileOrder[] = [];
 
 export function getProfileDisplayName(fullName: string) {
 	const [firstName, lastName] = fullName
@@ -53,23 +64,7 @@ export function getProfileDisplayName(fullName: string) {
 	return [firstName, lastName].filter(Boolean).join(" ") || fullName;
 }
 
-export function getProfileCustomerFromOrders(orders: OrderHistoryItem[]) {
-	const latestOrder = orders[0];
-
-	if (!latestOrder) {
-		return defaultProfileCustomer;
-	}
-
-	return {
-		...defaultProfileCustomer,
-		displayName: getProfileDisplayName(latestOrder.customer.fullName),
-		email: latestOrder.customer.email,
-		fullName: latestOrder.customer.fullName,
-		phone: latestOrder.customer.phone,
-	};
-}
-
-export function getProfileOrderItemsSummary(items: OrderHistoryItem["items"]) {
+export function getProfileOrderItemsSummary(items: ProfileOrder["items"]) {
 	const firstItem = items[0];
 
 	if (!firstItem) {
@@ -83,14 +78,4 @@ export function getProfileOrderItemsSummary(items: OrderHistoryItem["items"]) {
 	}
 
 	return `${firstItem.name} + ${additionalItemsCount} item${additionalItemsCount > 1 ? "s" : ""}`;
-}
-
-export function useProfileOrders() {
-	return useOrderHistoryStore((state) => state.orders);
-}
-
-export function useProfileCustomer() {
-	const orders = useProfileOrders();
-
-	return getProfileCustomerFromOrders(orders);
 }
