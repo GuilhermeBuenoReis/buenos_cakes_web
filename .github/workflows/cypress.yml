@@ -15,6 +15,21 @@ jobs:
     env:
       CI: true
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: buenos_cakes_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,17 +62,25 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: buenos_cakes_api
 
+      - name: Run database migrations
+        run: pnpm exec drizzle-kit migrate
+        working-directory: buenos_cakes_api
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/buenos_cakes_test
+
       - name: Start API server
         run: node_modules/.bin/tsx src/infra/http/server.ts &
         working-directory: buenos_cakes_api
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/buenos_cakes_test
+          NODE_ENV: development
 
       - name: Start web server
         run: NEXT_DIST_DIR=.next-e2e pnpm exec next dev --hostname localhost --port 3101 &
         working-directory: buenos_cakes_web
 
       - name: Wait for servers
-        run: |
-          npx wait-on http://localhost:3333/health http://localhost:3101 --timeout 120000
+        run: npx wait-on http://localhost:3333/health http://localhost:3101 --timeout 120000
         working-directory: buenos_cakes_web
 
       - name: Run Cypress tests
