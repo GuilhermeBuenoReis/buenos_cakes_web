@@ -23,7 +23,7 @@ export default defineConfig({
 	},
 	webServer: [
 		{
-			command: "pnpm --dir ../buenos_cakes_api dev",
+			command: `pnpm --dir ${process.env.E2E_API_DIR ?? "../buenos_cakes_api"} dev`,
 			reuseExistingServer: true,
 			timeout: 120_000,
 			url: `${API_BASE_URL}/health`,
