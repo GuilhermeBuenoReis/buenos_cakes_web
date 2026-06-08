@@ -62,6 +62,10 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: buenos_cakes_api
 
+      - name: Install Cypress binary
+        run: pnpm exec cypress install
+        working-directory: buenos_cakes_web
+
       - name: Run database migrations
         run: pnpm exec drizzle-kit migrate
         working-directory: buenos_cakes_api
