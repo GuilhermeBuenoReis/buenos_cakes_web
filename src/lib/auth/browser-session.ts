@@ -23,14 +23,18 @@ function getCookieSecureAttribute() {
 	return "; Secure";
 }
 
-function setAuthSessionCookie() {
+function setAuthSessionCookie(accessToken: string) {
 	// biome-ignore lint/suspicious/noDocumentCookie: Next proxy needs a route-readable session marker.
 	window.document.cookie = `${AUTH_SESSION_COOKIE_NAME}=${AUTH_SESSION_COOKIE_VALUE}; Path=/; Max-Age=${AUTH_SESSION_MAX_AGE_SECONDS}; SameSite=Lax${getCookieSecureAttribute()}`;
+	// biome-ignore lint/suspicious/noDocumentCookie: server-side RSC requests need the JWT to call the backend API.
+	window.document.cookie = `accessToken=${accessToken}; Path=/; Max-Age=${AUTH_SESSION_MAX_AGE_SECONDS}; SameSite=Lax${getCookieSecureAttribute()}`;
 }
 
 function clearAuthSessionCookie() {
 	// biome-ignore lint/suspicious/noDocumentCookie: keep browser storage and proxy cookie in sync.
 	window.document.cookie = `${AUTH_SESSION_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax${getCookieSecureAttribute()}`;
+	// biome-ignore lint/suspicious/noDocumentCookie: clear JWT cookie alongside session marker.
+	window.document.cookie = `accessToken=; Path=/; Max-Age=0; SameSite=Lax${getCookieSecureAttribute()}`;
 }
 
 export function getStoredAccessToken() {
@@ -51,7 +55,7 @@ export function persistAuthSession({ accessToken, user }: AuthSession) {
 		authSessionStorageKeys.user,
 		JSON.stringify(user),
 	);
-	setAuthSessionCookie();
+	setAuthSessionCookie(accessToken);
 }
 
 export function clearAuthSession() {

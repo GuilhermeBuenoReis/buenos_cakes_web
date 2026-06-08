@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requestBackend } from "../http-client";
+import { type BackendRouteOptions, requestBackend } from "../http-client";
 import { userSchema } from "../schemas/user";
 
 export const fetchCurrentUserResponseSchema = z.object({
@@ -10,15 +10,12 @@ export type FetchCurrentUserResponse = z.infer<
 	typeof fetchCurrentUserResponseSchema
 >;
 
-interface FetchCurrentUserOptions {
-	signal?: AbortSignal;
-}
-
 export async function fetchCurrentUser(
-	options: FetchCurrentUserOptions = {},
+	options: BackendRouteOptions = {},
 ): Promise<FetchCurrentUserResponse> {
 	return requestBackend({
 		method: "GET",
+		headers: options.headers,
 		responseSchema: fetchCurrentUserResponseSchema,
 		signal: options.signal,
 		url: "/api/users/me",

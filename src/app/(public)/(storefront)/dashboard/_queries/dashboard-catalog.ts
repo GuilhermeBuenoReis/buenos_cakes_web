@@ -8,6 +8,7 @@ import {
 	listActiveProducts,
 	listProductsByPopularity,
 } from "@/api/backend/catalog";
+import type { BackendRouteOptions } from "@/api/backend/http-client";
 
 export const DASHBOARD_PAGE = 1;
 export const DASHBOARD_ITEMS_LIMIT = 4;
@@ -31,38 +32,46 @@ export const dashboardCatalogQueryKeys = {
 	],
 } as const;
 
-export async function fetchDashboardCategories(signal?: AbortSignal) {
-	return listActiveCategories({ page: DASHBOARD_PAGE }, { signal });
+export async function fetchDashboardCategories(
+	options: BackendRouteOptions = {},
+) {
+	return listActiveCategories({ page: DASHBOARD_PAGE }, options);
 }
 
-export async function fetchSafeDashboardCategories(signal?: AbortSignal) {
+export async function fetchSafeDashboardCategories(
+	options: BackendRouteOptions = {},
+) {
 	try {
-		return await fetchDashboardCategories(signal);
+		return await fetchDashboardCategories(options);
 	} catch {
 		return emptyDashboardCategoriesResponse;
 	}
 }
 
-export async function fetchDashboardPopularProducts(signal?: AbortSignal) {
+export async function fetchDashboardPopularProducts(
+	options: BackendRouteOptions = {},
+) {
 	try {
 		const popularityResponse = await listProductsByPopularity(
 			{ page: DASHBOARD_PAGE },
-			{ signal },
+			options,
 		);
 
 		if (popularityResponse.products.length > 0) {
 			return popularityResponse;
 		}
 	} catch {
-		return listActiveProducts({ page: DASHBOARD_PAGE }, { signal });
+		return listActiveProducts({ page: DASHBOARD_PAGE }, options);
 	}
 
-	return listActiveProducts({ page: DASHBOARD_PAGE }, { signal });
+	return listActiveProducts({ page: DASHBOARD_PAGE }, options);
 }
 
-export async function fetchSafeDashboardPopularProducts(signal?: AbortSignal) {
+export async function fetchSafeDashboardPopularProducts(
+	options: BackendRouteOptions = {},
+) {
 	try {
-		return await fetchDashboardPopularProducts(signal);
+		return await fetchDashboardPopularProducts(options);
 	} catch {
 		return emptyDashboardPopularProductsResponse;
 	}
@@ -71,7 +80,7 @@ export async function fetchSafeDashboardPopularProducts(signal?: AbortSignal) {
 export function dashboardCategoriesQueryOptions() {
 	return queryOptions({
 		placeholderData: emptyDashboardCategoriesResponse,
-		queryFn: ({ signal }) => fetchDashboardCategories(signal),
+		queryFn: ({ signal }) => fetchDashboardCategories({ signal }),
 		queryKey: dashboardCatalogQueryKeys.categories(),
 		staleTime: DASHBOARD_STALE_TIME_MS,
 	});
@@ -80,7 +89,7 @@ export function dashboardCategoriesQueryOptions() {
 export function dashboardPopularProductsQueryOptions() {
 	return queryOptions({
 		placeholderData: emptyDashboardPopularProductsResponse,
-		queryFn: ({ signal }) => fetchDashboardPopularProducts(signal),
+		queryFn: ({ signal }) => fetchDashboardPopularProducts({ signal }),
 		queryKey: dashboardCatalogQueryKeys.popularProducts(),
 		staleTime: DASHBOARD_STALE_TIME_MS,
 	});

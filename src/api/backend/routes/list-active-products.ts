@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requestBackend } from "../http-client";
+import { type BackendRouteOptions, requestBackend } from "../http-client";
 import { paginationRequestSchema } from "../schemas/pagination";
 import { productSchema } from "../schemas/product";
 
@@ -17,18 +17,15 @@ export type ListActiveProductsResponse = z.infer<
 	typeof listActiveProductsResponseSchema
 >;
 
-interface ListActiveProductsOptions {
-	signal?: AbortSignal;
-}
-
 export async function listActiveProducts(
 	input: ListActiveProductsRequestInput = {},
-	options: ListActiveProductsOptions = {},
+	options: BackendRouteOptions = {},
 ): Promise<ListActiveProductsResponse> {
 	const params = listActiveProductsRequestSchema.parse(input);
 
 	return requestBackend({
 		method: "GET",
+		headers: options.headers,
 		params,
 		responseSchema: listActiveProductsResponseSchema,
 		signal: options.signal,

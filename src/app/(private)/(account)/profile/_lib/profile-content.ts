@@ -1,5 +1,3 @@
-"use client";
-
 import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
 
 export interface ProfileCustomer {
@@ -41,12 +39,27 @@ export const profileAddresses = [
 	},
 ] as const;
 
-export type ProfileOrderStatusTone = "confirmed";
+export interface ProfileAddress {
+	badge: string;
+	details: string;
+	label: string;
+	line1: string;
+	line2: string;
+}
+
+export type ProfileOrderStatusTone =
+	| "canceled"
+	| "completed"
+	| "confirmed"
+	| "pending"
+	| "preparing"
+	| "ready";
 
 export interface ProfileOrder {
 	dateLabel: string;
 	id: string;
 	items: CartSheetItemData[];
+	itemsSummary?: string;
 	number: string;
 	status: string;
 	statusTone: ProfileOrderStatusTone;

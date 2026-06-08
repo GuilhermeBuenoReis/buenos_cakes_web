@@ -2,8 +2,12 @@
 
 import { LogOut, MapPin, Package2, UserRound } from "lucide-react";
 import Image from "next/image";
+import { getE2EStableImageSrc } from "@/lib/e2e-stable-image";
 import { cn } from "@/lib/utils";
-import { defaultProfileCustomer } from "../_lib/profile-content";
+import {
+	defaultProfileCustomer,
+	type ProfileCustomer,
+} from "../_lib/profile-content";
 
 const profileNavigationItems = [
 	{
@@ -26,9 +30,13 @@ const profileNavigationItems = [
 	},
 ] as const;
 
-export function ProfileSidebar() {
-	const customer = defaultProfileCustomer;
+interface ProfileSidebarProps {
+	customer?: ProfileCustomer;
+}
 
+export function ProfileSidebar({
+	customer = defaultProfileCustomer,
+}: ProfileSidebarProps) {
 	return (
 		<aside className="rounded-[2rem] border border-white/70 bg-white/92 p-5 shadow-[0_28px_70px_-50px_rgba(15,23,42,0.18)] backdrop-blur-sm sm:p-6">
 			<div className="flex items-center gap-3">
@@ -39,7 +47,7 @@ export function ProfileSidebar() {
 						fill
 						priority
 						sizes="60px"
-						src={customer.avatar}
+						src={getE2EStableImageSrc(customer.avatar)}
 					/>
 				</div>
 

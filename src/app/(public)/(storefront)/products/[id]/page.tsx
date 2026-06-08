@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductById, getProductIds, getProducts } from "@/api/products";
+import { getProductById, getProducts } from "@/api/products";
 import { ProductAboutCard } from "./_components/product-about-card";
 import { ProductBreadcrumb } from "./_components/product-breadcrumb";
 import { ProductGallery } from "./_components/product-gallery";
@@ -14,11 +14,8 @@ interface ProductDetailsPageProps {
 }
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
 const RELATED_IMAGES_LIMIT = 4;
-
-export async function generateStaticParams() {
-	return getProductIds().map((id) => ({ id }));
-}
 
 export async function generateMetadata({
 	params,

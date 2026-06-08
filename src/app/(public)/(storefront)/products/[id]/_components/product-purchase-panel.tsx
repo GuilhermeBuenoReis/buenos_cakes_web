@@ -24,8 +24,10 @@ export function ProductPurchasePanel() {
 		product,
 		quantity,
 		selectedFilling,
-		selectedSize,
+		selectedFillingId,
+		selectedSizeId,
 		selectedSizeLabel,
+		selectedUnitPrice,
 		setFilling,
 		setMessage,
 		setQuantity,
@@ -35,7 +37,7 @@ export function ProductPurchasePanel() {
 
 	function handleAddToCart() {
 		const trimmedMessage = message.trim();
-		const highlightParts = [selectedSizeLabel, selectedFilling];
+		const highlightParts = [selectedSizeLabel, selectedFilling.label];
 
 		if (trimmedMessage) {
 			highlightParts.push("Com mensagem");
@@ -43,17 +45,21 @@ export function ProductPurchasePanel() {
 
 		addItem({
 			highlight: highlightParts.join(" • "),
-			id: [product.id, selectedSize, selectedFilling, trimmedMessage]
+			id: [product.id, selectedSizeId, selectedFillingId, trimmedMessage]
 				.filter(Boolean)
 				.join("::"),
 			image: product.image,
 			name: product.name,
+			note: trimmedMessage || null,
+			productFillingId: selectedFillingId || null,
+			productId: product.id,
+			productSizeId: selectedSizeId || null,
 			quantity,
-			unitPrice: product.price,
+			unitPrice: selectedUnitPrice,
 		});
 	}
 
-	function handleSizeSelection(sizeId: (typeof sizeOptions)[number]["id"]) {
+	function handleSizeSelection(sizeId: string) {
 		setSize(sizeId);
 	}
 
@@ -97,7 +103,7 @@ export function ProductPurchasePanel() {
 						{product.name}
 					</h1>
 					<p className="text-[1.65rem] font-black tracking-tight text-rose-500 sm:text-[1.85rem]">
-						{formatPrice(product.price)}
+						{formatPrice(selectedUnitPrice)}
 					</p>
 				</div>
 			</div>
@@ -108,7 +114,7 @@ export function ProductPurchasePanel() {
 				</p>
 				<div className="grid gap-2 sm:grid-cols-3">
 					{sizeOptions.map((size) => {
-						const isActive = size.id === selectedSize;
+						const isActive = size.id === selectedSizeId;
 
 						function handleSizeButtonClick() {
 							handleSizeSelection(size.id);
@@ -130,7 +136,8 @@ export function ProductPurchasePanel() {
 									{size.label}
 								</p>
 								<p className="text-[11px] font-medium text-slate-500">
-									{size.servings}
+									{size.servings ||
+										formatPrice(product.price + size.priceDelta)}
 								</p>
 							</button>
 						);
@@ -143,7 +150,7 @@ export function ProductPurchasePanel() {
 					Recheio extra
 				</p>
 				<Select
-					value={selectedFilling}
+					value={selectedFillingId}
 					onValueChange={handleFillingValueChange}
 				>
 					<SelectTrigger
@@ -154,8 +161,10 @@ export function ProductPurchasePanel() {
 					</SelectTrigger>
 					<SelectContent className="rounded-[18px] border-slate-200">
 						{fillings.map((filling) => (
-							<SelectItem key={filling} value={filling}>
-								{filling}
+							<SelectItem key={filling.id} value={filling.id}>
+								{filling.priceDelta > 0
+									? `${filling.label} (+${formatPrice(filling.priceDelta)})`
+									: filling.label}
 							</SelectItem>
 						))}
 					</SelectContent>

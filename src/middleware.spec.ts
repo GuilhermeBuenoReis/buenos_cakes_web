@@ -4,7 +4,7 @@ import {
 	AUTH_SESSION_COOKIE_NAME,
 	AUTH_SESSION_COOKIE_VALUE,
 } from "@/lib/auth/session-config";
-import { config, proxy } from "./proxy";
+import { config, middleware } from "./middleware";
 
 function makeRequest(
 	pathname: string,
@@ -27,13 +27,13 @@ function makeRequest(
 	});
 }
 
-describe("proxy", () => {
+describe("middleware", () => {
 	it("keeps backend api proxy paths outside the auth proxy matcher", () => {
 		expect(config.matcher[0]).toContain("backend-api");
 	});
 
 	it("redirects unauthenticated visitors to sign-in with callback", () => {
-		const response = proxy(makeRequest("/products?page=2"));
+		const response = middleware(makeRequest("/products?page=2"));
 
 		expect(response.status).toBe(307);
 		expect(response.headers.get("location")).toBe(
@@ -42,14 +42,14 @@ describe("proxy", () => {
 	});
 
 	it("allows unauthenticated visitors on auth routes", () => {
-		const response = proxy(makeRequest("/sign-up"));
+		const response = middleware(makeRequest("/sign-up"));
 
 		expect(response.status).toBe(200);
 		expect(response.headers.get("location")).toBeNull();
 	});
 
 	it("redirects authenticated visitors from auth routes to dashboard", () => {
-		const response = proxy(makeRequest("/sign-in", true));
+		const response = middleware(makeRequest("/sign-in", true));
 
 		expect(response.status).toBe(307);
 		expect(response.headers.get("location")).toBe(
@@ -58,7 +58,7 @@ describe("proxy", () => {
 	});
 
 	it("allows authenticated visitors on protected routes", () => {
-		const response = proxy(makeRequest("/checkout", true));
+		const response = middleware(makeRequest("/checkout", true));
 
 		expect(response.status).toBe(200);
 		expect(response.headers.get("location")).toBeNull();

@@ -4,6 +4,8 @@ import {
 	AUTH_SESSION_COOKIE_VALUE,
 } from "../../../lib/auth/session-config";
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Auth", () => {
 	test.beforeEach(async ({ context }) => {
 		await context.clearCookies();

@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
-import dayjs from "dayjs";
+import { dayjs } from "@/lib/dayjs";
+import { addFirstCatalogProductToCart } from "@/test/e2e-storefront";
 import {
 	formatPickupSummaryDate,
 	getInitialPickupDate,
@@ -18,19 +19,21 @@ async function goToCheckoutFromCart(page: Page) {
 	await Promise.all([page.waitForURL(/\/checkout$/), checkoutButton.click()]);
 }
 
+async function addCatalogProductAndGoToCheckout(page: Page) {
+	const product = await addFirstCatalogProductToCart(page);
+
+	await goToCheckoutFromCart(page);
+
+	return product;
+}
+
 test.describe("Checkout", () => {
 	test.describe.configure({ mode: "serial" });
 
 	test("navigates from the cart to checkout and preserves the order summary", async ({
 		page,
 	}) => {
-		await page.goto("/products");
-
-		await page
-			.getByRole("button", {
-				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-			})
-			.click();
+		const product = await addFirstCatalogProductToCart(page);
 
 		await expect(
 			page.getByRole("heading", { name: "Meu Carrinho" }),
@@ -41,7 +44,7 @@ test.describe("Checkout", () => {
 		await expect(
 			page.getByRole("heading", { name: "Finalizar Pedido" }),
 		).toBeVisible();
-		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
+		await expect(page.getByText(product.name)).toBeVisible();
 		await expect(page.getByText("Qtd. 1")).toBeVisible();
 		await expect(page.getByText("1 item")).toBeVisible();
 		await expect(
@@ -109,15 +112,7 @@ test.describe("Checkout", () => {
 	test("moves to the payment step when clicking next step", async ({
 		page,
 	}) => {
-		await page.goto("/products");
-
-		await page
-			.getByRole("button", {
-				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-			})
-			.click();
-
-		await goToCheckoutFromCart(page);
+		await addCatalogProductAndGoToCheckout(page);
 		await page.getByLabel("Nome Completo").fill("Ana Beatriz Souza");
 		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");
 		await page.getByLabel("WhatsApp / Telefone").fill("(11) 99876-5432");
@@ -133,15 +128,7 @@ test.describe("Checkout", () => {
 	test("keeps progression disabled while personal info is invalid", async ({
 		page,
 	}) => {
-		await page.goto("/products");
-
-		await page
-			.getByRole("button", {
-				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-			})
-			.click();
-
-		await goToCheckoutFromCart(page);
+		await addCatalogProductAndGoToCheckout(page);
 
 		await expect(
 			page.getByRole("button", { name: "Próximo Passo" }),
@@ -154,15 +141,7 @@ test.describe("Checkout", () => {
 	test("confirms the order and makes it available in the profile page", async ({
 		page,
 	}) => {
-		await page.goto("/products");
-
-		await page
-			.getByRole("button", {
-				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-			})
-			.click();
-
-		await goToCheckoutFromCart(page);
+		const product = await addCatalogProductAndGoToCheckout(page);
 
 		await page.getByLabel("Nome Completo").fill("Ana Beatriz Souza");
 		await page.getByLabel("E-mail").fill("ana.souza@exemplo.com");
@@ -171,20 +150,18 @@ test.describe("Checkout", () => {
 		await page.getByRole("button", { name: "Próximo Passo" }).click();
 		await expect(page).toHaveURL(/\/checkout\/payment$/);
 
-		await page.locator("label").filter({ hasText: "Cartão de débito" }).click();
+		await page.locator("label").filter({ hasText: "Dinheiro" }).click();
 		await page.getByRole("link", { name: "Continuar para revisão" }).click();
 
 		await expect(page).toHaveURL(/\/checkout\/review$/);
 		await expect(
 			page.getByRole("heading", { name: "Revisão do Pedido" }),
 		).toBeVisible();
-		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
+		await expect(page.getByText(product.name)).toBeVisible();
 		await expect(page.getByText("Ana Beatriz Souza")).toBeVisible();
 		await expect(page.getByText("ana.souza@exemplo.com")).toBeVisible();
 		await expect(page.getByText("(11) 99876-5432")).toBeVisible();
-		await expect(
-			page.getByText("Cartão de débito", { exact: true }),
-		).toBeVisible();
+		await expect(page.getByText("Dinheiro", { exact: true })).toBeVisible();
 		await expect(page.getByText("Às 14:00").first()).toBeVisible();
 		await expect(
 			page.getByRole("link", { name: "Voltar para pagamento" }),
@@ -195,21 +172,22 @@ test.describe("Checkout", () => {
 
 		await page.getByRole("button", { name: "Confirmar Pedido" }).click();
 
-		await expect(page).toHaveURL(/\/profile#order-\d+$/);
+		await expect(page).toHaveURL(/\/profile#order-/);
 		await expect(
 			page.getByRole("heading", { name: "Pedidos Recentes" }),
 		).toBeVisible();
-		await expect(page.getByText("Ana Beatriz Souza")).toBeVisible();
-		await expect(page.getByText("#9482")).toBeVisible();
-		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
+		const confirmedOrderId = new URL(page.url()).hash.slice(1);
+		const confirmedOrderRow = page.locator(`[id="${confirmedOrderId}"]`);
+		await expect(confirmedOrderRow).toBeVisible();
+		await expect(confirmedOrderRow.getByText(/^#[A-Z0-9]{8}$/)).toBeVisible();
+		await expect(confirmedOrderRow.getByText(/R\$/)).toBeVisible();
 		await expect(
 			page.getByRole("button", { name: "Carrinho" }).getByText("0"),
 		).toBeVisible();
 
 		await page.reload();
 
-		await expect(page).toHaveURL(/\/profile#order-\d+$/);
-		await expect(page.getByText("#9482")).toBeVisible();
-		await expect(page.getByText("Bolo Red Velvet Premium")).toBeVisible();
+		await expect(page).toHaveURL(/\/profile#order-/);
+		await expect(page.locator(`[id="${confirmedOrderId}"]`)).toBeVisible();
 	});
 });

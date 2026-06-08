@@ -1,25 +1,21 @@
 import { expect, test } from "@playwright/test";
+import { openFirstCatalogProductDetails } from "@/test/e2e-storefront";
 
 test.describe("Product details route", () => {
 	test("navigates to product detail when clicking a product card", async ({
 		page,
 	}) => {
-		await page.goto("/products");
+		const product = await openFirstCatalogProductDetails(page);
 
-		await page
-			.getByLabel("Ver detalhes de Bolo Red Velvet Premium")
-			.first()
-			.click();
-
-		await expect(page).toHaveURL(/\/products\/prd_8f3a92c1$/);
+		await expect(page).toHaveURL(new RegExp(`${product.detailsHref}$`));
 		await expect(
-			page.getByRole("heading", { name: "Bolo Red Velvet Premium" }),
+			page.getByRole("heading", { name: product.name }),
 		).toBeVisible();
-		await expect(page.getByRole("link", { name: "Bolos" })).toBeVisible();
 		await expect(
-			page.getByText(
-				"Massa aveludada de cacau suave com recheio cremoso e acabamento sofisticado para ocasioes especiais.",
-			),
+			page.getByRole("heading", { name: /Sobre este/ }),
+		).toBeVisible();
+		await expect(
+			page.getByRole("button", { name: "Adicionar ao Carrinho" }),
 		).toBeVisible();
 	});
 

@@ -13,6 +13,10 @@ export interface CartSheetItemData {
 	id: string;
 	image: string;
 	name: string;
+	note?: string | null;
+	productFillingId?: string | null;
+	productId?: string;
+	productSizeId?: string | null;
 	quantity: number;
 	unitPrice: number;
 }

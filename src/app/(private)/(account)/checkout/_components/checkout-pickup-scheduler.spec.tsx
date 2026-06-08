@@ -38,7 +38,9 @@ describe("CheckoutPickupScheduler", () => {
 
 	it("opens the calendar and allows selecting a date from the next week", async () => {
 		const user = userEvent.setup();
-		const calendarOnlyDate = dayjs(getInitialPickupDate()).add(7, "day").toDate();
+		const calendarOnlyDate = dayjs(getInitialPickupDate())
+			.add(7, "day")
+			.toDate();
 
 		renderCheckoutPickupScheduler();
 

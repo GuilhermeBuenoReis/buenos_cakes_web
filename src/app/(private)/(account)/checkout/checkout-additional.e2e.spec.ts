@@ -1,4 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
+import { addFirstCatalogProductToCart } from "@/test/e2e-storefront";
 
 async function goToCheckoutFromCart(page: Page) {
 	const cartDialog = page.getByRole("dialog", { name: "Meu Carrinho" });
@@ -21,21 +22,23 @@ async function goToCheckoutPayment(
 		phone: string;
 	},
 ) {
-	await page.goto("/products");
-
-	await page
-		.getByRole("button", {
-			name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-		})
-		.click();
+	const product = await addFirstCatalogProductToCart(page);
 
 	await goToCheckoutFromCart(page);
 	await page.getByLabel("Nome Completo").fill(customer.fullName);
 	await page.getByLabel("E-mail").fill(customer.email);
 	await page.getByLabel("WhatsApp / Telefone").fill(customer.phone);
-	await page.getByRole("button", { name: "Próximo Passo" }).click();
+
+	const paymentButton = page.getByRole("button", {
+		name: "Ir para Pagamento",
+	});
+
+	await expect(paymentButton).toBeEnabled();
+	await paymentButton.click();
 
 	await expect(page).toHaveURL(/\/checkout\/payment$/);
+
+	return product;
 }
 
 async function goToCheckoutReview(
@@ -46,10 +49,13 @@ async function goToCheckoutReview(
 		phone: string;
 	},
 ) {
-	await goToCheckoutPayment(page, customer);
+	const product = await goToCheckoutPayment(page, customer);
+
 	await page.getByRole("link", { name: "Continuar para revisão" }).click();
 
 	await expect(page).toHaveURL(/\/checkout\/review$/);
+
+	return product;
 }
 
 test.describe("Checkout additional flows", () => {
@@ -81,7 +87,7 @@ test.describe("Checkout additional flows", () => {
 	test("returns to products with the cart open when editing an item from review", async ({
 		page,
 	}) => {
-		await goToCheckoutReview(page, {
+		const product = await goToCheckoutReview(page, {
 			email: "camila@exemplo.com",
 			fullName: "Camila Araujo",
 			phone: "(11) 96666-2222",
@@ -95,7 +101,7 @@ test.describe("Checkout additional flows", () => {
 		).toBeVisible();
 		await expect(
 			page.getByRole("dialog").getByRole("heading", {
-				name: "Bolo Red Velvet Premium",
+				name: product.name,
 			}),
 		).toBeVisible();
 	});

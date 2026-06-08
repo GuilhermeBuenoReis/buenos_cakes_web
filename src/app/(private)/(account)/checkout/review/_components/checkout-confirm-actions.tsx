@@ -3,12 +3,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface CheckoutConfirmActionsProps {
+	confirmLabel?: string;
 	confirmDisabled?: boolean;
-	onConfirm?: () => void;
+	errorMessage?: string | null;
+	helperText?: string;
+	onConfirm?: () => Promise<void> | void;
 }
 
 export function CheckoutConfirmActions({
+	confirmLabel = "Confirmar Pedido",
 	confirmDisabled = false,
+	errorMessage = null,
+	helperText = "Confira os dados acima antes de avançar para a confirmação visual.",
 	onConfirm,
 }: CheckoutConfirmActionsProps) {
 	return (
@@ -28,12 +34,15 @@ export function CheckoutConfirmActions({
 					onClick={onConfirm}
 					type="button"
 				>
-					Confirmar Pedido
+					{confirmLabel}
 					<CheckCheck className="size-4" />
 				</Button>
-				<p className="text-xs leading-5 text-slate-500">
-					Confira os dados acima antes de avançar para a confirmação visual.
-				</p>
+				<p className="text-xs leading-5 text-slate-500">{helperText}</p>
+				{errorMessage ? (
+					<p className="text-xs font-semibold leading-5 text-rose-600">
+						{errorMessage}
+					</p>
+				) : null}
 			</div>
 		</div>
 	);

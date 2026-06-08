@@ -4,13 +4,22 @@ import type {
 } from "@/api/backend/catalog";
 import type { ApiCategory } from "@/api/backend/schemas/category";
 import type { ApiProduct } from "@/api/backend/schemas/product";
+import {
+	E2E_STABLE_IMAGE_SRC,
+	shouldUseE2EStableImages,
+} from "@/lib/e2e-stable-image";
 import { DASHBOARD_ITEMS_LIMIT } from "../_queries/dashboard-catalog";
 import {
 	getFallbackCategoryImage,
 	getFallbackProductImage,
 } from "./dashboard-fallbacks";
 
-const safeImageHostnames = new Set(["images.unsplash.com", "localhost"]);
+const safeImageHostnames = new Set([
+	"commons.wikimedia.org",
+	"images.unsplash.com",
+	"localhost",
+	"upload.wikimedia.org",
+]);
 
 export interface DashboardCategoryCard {
 	id: string;
@@ -37,6 +46,10 @@ function getSafeImageUrl(
 	imageUrl: string | null | undefined,
 	fallback: string,
 ) {
+	if (shouldUseE2EStableImages()) {
+		return E2E_STABLE_IMAGE_SRC;
+	}
+
 	const trimmedImageUrl = imageUrl?.trim();
 
 	if (!trimmedImageUrl) {

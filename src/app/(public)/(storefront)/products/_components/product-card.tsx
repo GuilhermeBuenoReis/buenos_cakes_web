@@ -21,6 +21,7 @@ export function ProductCard({ product }: ProductCardProps) {
 			id: product.id,
 			image: product.image,
 			name: product.name,
+			productId: product.id,
 			unitPrice: product.price,
 		});
 	}

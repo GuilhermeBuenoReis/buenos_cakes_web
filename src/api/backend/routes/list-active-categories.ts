@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requestBackend } from "../http-client";
+import { type BackendRouteOptions, requestBackend } from "../http-client";
 import { categorySchema } from "../schemas/category";
 import { paginationRequestSchema } from "../schemas/pagination";
 
@@ -17,18 +17,15 @@ export type ListActiveCategoriesResponse = z.infer<
 	typeof listActiveCategoriesResponseSchema
 >;
 
-interface ListActiveCategoriesOptions {
-	signal?: AbortSignal;
-}
-
 export async function listActiveCategories(
 	input: ListActiveCategoriesRequestInput = {},
-	options: ListActiveCategoriesOptions = {},
+	options: BackendRouteOptions = {},
 ): Promise<ListActiveCategoriesResponse> {
 	const params = listActiveCategoriesRequestSchema.parse(input);
 
 	return requestBackend({
 		method: "GET",
+		headers: options.headers,
 		params,
 		responseSchema: listActiveCategoriesResponseSchema,
 		signal: options.signal,

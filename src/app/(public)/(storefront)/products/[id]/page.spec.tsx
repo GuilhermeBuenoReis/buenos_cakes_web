@@ -6,7 +6,6 @@ import { CartSheetProvider } from "@/contexts/cart-sheet-context";
 
 const mocks = vi.hoisted(() => ({
 	getProductById: vi.fn(),
-	getProductIds: vi.fn(),
 	getProducts: vi.fn(),
 	notFound: vi.fn(() => {
 		throw new Error("NEXT_NOT_FOUND");
@@ -15,7 +14,6 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/api/products", () => ({
 	getProductById: mocks.getProductById,
-	getProductIds: mocks.getProductIds,
 	getProducts: mocks.getProducts,
 }));
 
@@ -23,10 +21,7 @@ vi.mock("next/navigation", () => ({
 	notFound: mocks.notFound,
 }));
 
-import ProductDetailsPage, {
-	generateMetadata,
-	generateStaticParams,
-} from "./page";
+import ProductDetailsPage, { generateMetadata } from "./page";
 
 const baseProduct: Product = {
 	category: "Bolos",
@@ -45,15 +40,6 @@ const baseProduct: Product = {
 describe("ProductDetailsPage", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-	});
-
-	it("returns static params from the product ids", async () => {
-		mocks.getProductIds.mockReturnValue([baseProduct.id, "prd_f03dc9b7"]);
-
-		await expect(generateStaticParams()).resolves.toEqual([
-			{ id: baseProduct.id },
-			{ id: "prd_f03dc9b7" },
-		]);
 	});
 
 	it("builds the metadata title for an existing product", async () => {

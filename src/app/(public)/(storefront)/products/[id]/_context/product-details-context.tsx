@@ -1,28 +1,47 @@
 "use client";
 
-import {
-	parseAsInteger,
-	parseAsString,
-	parseAsStringEnum,
-	useQueryStates,
-} from "nuqs";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import {
 	createContext,
 	type PropsWithChildren,
 	useContext,
 	useMemo,
 } from "react";
-import type { Product } from "@/api/products/types";
+import type {
+	Product,
+	ProductFillingOption,
+	ProductSizeOption,
+} from "@/api/products/types";
 
-const sizeOptions = [
-	{ id: "pequeno", label: "Pequeno", servings: "Serve 4-6" },
-	{ id: "medio", label: "Medio", servings: "Serve 8-10" },
-	{ id: "grande", label: "Grande", servings: "Serve 12-15" },
-] as const;
-
-type SizeOptionId = (typeof sizeOptions)[number]["id"];
-
-const sizeOptionIds = sizeOptions.map((size) => size.id) as SizeOptionId[];
+const fallbackSizeOptions: ProductSizeOption[] = [
+	{
+		code: "pequeno",
+		id: "pequeno",
+		isDefault: true,
+		label: "Pequeno",
+		priceDelta: 0,
+		servings: "Serve 4-6",
+		sortOrder: 1,
+	},
+	{
+		code: "medio",
+		id: "medio",
+		isDefault: false,
+		label: "Medio",
+		priceDelta: 0,
+		servings: "Serve 8-10",
+		sortOrder: 2,
+	},
+	{
+		code: "grande",
+		id: "grande",
+		isDefault: false,
+		label: "Grande",
+		priceDelta: 0,
+		servings: "Serve 12-15",
+		sortOrder: 3,
+	},
+];
 
 function clampQuantity(quantity: number) {
 	return Math.max(1, quantity);
@@ -32,40 +51,70 @@ function clampMessage(message: string) {
 	return message.slice(0, 50);
 }
 
-function getFillingsForCategory(category: string) {
+function getFallbackFillingsForCategory(
+	category: string,
+): ProductFillingOption[] {
 	if (category === "Bolos") {
 		return [
 			"Creme de Baunilha (Padrao)",
 			"Brigadeiro Cremoso",
 			"Morango com Chantilly",
-		];
+		].map(toFallbackFillingOption);
 	}
 
 	if (category === "Tortas") {
-		return ["Creme Citrico (Padrao)", "Ganache Leve", "Frutas Vermelhas"];
+		return ["Creme Citrico (Padrao)", "Ganache Leve", "Frutas Vermelhas"].map(
+			toFallbackFillingOption,
+		);
 	}
 
 	if (category === "Cookies") {
-		return ["Chocolate Intenso", "Doce de Leite", "Pistache"];
+		return ["Chocolate Intenso", "Doce de Leite", "Pistache"].map(
+			toFallbackFillingOption,
+		);
 	}
 
-	return ["Receita da Casa", "Chocolate Belga", "Baunilha Premium"];
+	return ["Receita da Casa", "Chocolate Belga", "Baunilha Premium"].map(
+		toFallbackFillingOption,
+	);
+}
+
+function toFallbackFillingOption(
+	label: string,
+	index: number,
+): ProductFillingOption {
+	return {
+		id: label,
+		isDefault: index === 0,
+		label,
+		priceDelta: 0,
+		sortOrder: index + 1,
+	};
+}
+
+function getDefaultOptionId<TOption extends { id: string; isDefault: boolean }>(
+	options: TOption[],
+) {
+	return options.find((option) => option.isDefault)?.id ?? options[0]?.id ?? "";
 }
 
 interface ProductDetailsContextValue {
-	fillings: string[];
+	fillings: ProductFillingOption[];
 	fullStars: number;
 	message: string;
 	product: Product;
 	quantity: number;
-	selectedFilling: string;
-	selectedSize: SizeOptionId;
+	selectedFilling: ProductFillingOption;
+	selectedFillingId: string;
+	selectedSize: ProductSizeOption;
+	selectedSizeId: string;
 	selectedSizeLabel: string;
-	setFilling: (nextFilling: string) => void;
+	selectedUnitPrice: number;
+	setFilling: (nextFillingId: string) => void;
 	setMessage: (nextMessage: string) => void;
 	setQuantity: (nextQuantity: number) => void;
-	setSize: (nextSize: SizeOptionId) => void;
-	sizeOptions: readonly (typeof sizeOptions)[number][];
+	setSize: (nextSizeId: string) => void;
+	sizeOptions: ProductSizeOption[];
 	thumbnailProducts: Product[];
 }
 
@@ -83,16 +132,25 @@ export function ProductDetailsProvider({
 	product,
 	relatedImages,
 }: ProductDetailsProviderProps) {
-	const fillings = useMemo(
-		() => getFillingsForCategory(product.category),
-		[product.category],
-	);
-	const defaultFilling = fillings[0] ?? "";
+	const fillings = useMemo(() => {
+		const productFillings = product.fillings ?? [];
+
+		return productFillings.length > 0
+			? productFillings
+			: getFallbackFillingsForCategory(product.category);
+	}, [product.category, product.fillings]);
+	const sizeOptions = useMemo(() => {
+		const productSizes = product.sizes ?? [];
+
+		return productSizes.length > 0 ? productSizes : [...fallbackSizeOptions];
+	}, [product.sizes]);
+	const defaultFillingId = getDefaultOptionId(fillings);
+	const defaultSizeId = getDefaultOptionId(sizeOptions);
 	const [customization, setCustomization] = useQueryStates({
-		filling: parseAsStringEnum(fillings).withDefault(defaultFilling),
+		filling: parseAsString.withDefault(defaultFillingId),
 		message: parseAsString.withDefault(""),
 		quantity: parseAsInteger.withDefault(1),
-		size: parseAsStringEnum(sizeOptionIds).withDefault("pequeno"),
+		size: parseAsString.withDefault(defaultSizeId),
 	});
 
 	const thumbnailProducts =
@@ -101,23 +159,30 @@ export function ProductDetailsProvider({
 	const selectedSizeOption =
 		sizeOptions.find((size) => size.id === customization.size) ??
 		sizeOptions[0];
+	const selectedFillingOption =
+		fillings.find((filling) => filling.id === customization.filling) ??
+		fillings[0];
 	const quantity = clampQuantity(customization.quantity);
 	const message = clampMessage(customization.message);
+	const selectedUnitPrice =
+		product.price +
+		(selectedSizeOption?.priceDelta ?? 0) +
+		(selectedFillingOption?.priceDelta ?? 0);
 
-	function setSize(nextSize: SizeOptionId) {
-		if (nextSize === customization.size) {
+	function setSize(nextSizeId: string) {
+		if (nextSizeId === customization.size) {
 			return;
 		}
 
-		setCustomization({ size: nextSize });
+		setCustomization({ size: nextSizeId });
 	}
 
-	function setFilling(nextFilling: string) {
-		if (nextFilling === customization.filling) {
+	function setFilling(nextFillingId: string) {
+		if (nextFillingId === customization.filling) {
 			return;
 		}
 
-		setCustomization({ filling: nextFilling });
+		setCustomization({ filling: nextFillingId });
 	}
 
 	function setMessage(nextMessage: string) {
@@ -146,9 +211,12 @@ export function ProductDetailsProvider({
 		message,
 		product,
 		quantity,
-		selectedFilling: customization.filling,
-		selectedSize: customization.size,
-		selectedSizeLabel: selectedSizeOption.label,
+		selectedFilling: selectedFillingOption,
+		selectedFillingId: selectedFillingOption?.id ?? "",
+		selectedSize: selectedSizeOption,
+		selectedSizeId: selectedSizeOption?.id ?? "",
+		selectedSizeLabel: selectedSizeOption?.label ?? "",
+		selectedUnitPrice,
 		setFilling,
 		setMessage,
 		setQuantity,

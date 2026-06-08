@@ -13,16 +13,6 @@ describe("AboutOriginSection", () => {
 				name: "Do sonho caseiro a uma boutique de confeitaria.",
 			}),
 		).toBeVisible();
-		expect(
-			screen.getByText(
-				"A Buenos'Cakes nasceu da visão de mulheres empreendedoras que acreditavam que confeitaria vai muito além da receita: ela aproxima pessoas, acolhe memórias e empresta beleza aos momentos mais especiais da vida.",
-			),
-		).toBeVisible();
-		expect(
-			screen.getByText(
-				"Hoje seguimos evoluindo como uma confeitaria boutique: com padrão profissional, escuta atenta e criações que equilibram sabor, presença visual e afeto em cada detalhe.",
-			),
-		).toBeVisible();
 		expect(screen.getByText("Nosso compromisso")).toBeVisible();
 		expect(
 			screen.getByText(

@@ -1,4 +1,8 @@
 import Image from "next/image";
+import { getE2EStableImageSrc } from "@/lib/e2e-stable-image";
+
+const aboutHeroImageUrl =
+	"https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1600&q=80";
 
 export function AboutHero() {
 	return (
@@ -10,7 +14,7 @@ export function AboutHero() {
 					fill
 					priority
 					sizes="100vw"
-					src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1600&q=80"
+					src={getE2EStableImageSrc(aboutHeroImageUrl)}
 				/>
 				<div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(35,22,27,0.28),rgba(35,22,27,0.72))]" />
 			</div>

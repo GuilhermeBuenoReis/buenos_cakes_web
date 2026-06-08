@@ -1,4 +1,5 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getServerBackendAuthHeaders } from "@/api/backend/server-auth";
 import { getServerQueryClient } from "@/lib/get-server-query-client";
 import { CategoriesShowcase } from "./_components/categories-showcase";
 import { Hero } from "./_components/hero";
@@ -13,9 +14,10 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
 	const queryClient = getServerQueryClient();
+	const headers = await getServerBackendAuthHeaders();
 	const [categories, popularProducts] = await Promise.all([
-		fetchSafeDashboardCategories(),
-		fetchSafeDashboardPopularProducts(),
+		fetchSafeDashboardCategories({ headers }),
+		fetchSafeDashboardPopularProducts({ headers }),
 	]);
 
 	queryClient.setQueryData(dashboardCatalogQueryKeys.categories(), categories);

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getFirstCatalogProduct } from "@/test/e2e-storefront";
 
 function getQueryParam(url: string, key: string) {
 	return new URL(url).searchParams.get(key);
@@ -14,12 +15,13 @@ test.describe("Products catalog filters", () => {
 	}) => {
 		await page.goto("/products?page=2&rating=4");
 
-		await expect(page.getByText("Mostrando 4 de 12 produtos")).toBeVisible();
+		await expect(page.getByText(/Mostrando \d+ de \d+ produtos/)).toBeVisible();
+		await getFirstCatalogProduct(page);
 
 		await page.getByLabel("Avaliação mínima de 3 estrelas").check();
 
 		await expect.poll(() => getQueryParam(page.url(), "rating")).toBe("4");
-		await expect(page.getByText("Mostrando 4 de 12 produtos")).toBeVisible();
+		await expect(page.getByText(/Mostrando \d+ de \d+ produtos/)).toBeVisible();
 
 		await page.getByRole("button", { name: "Aplicar Filtros" }).click();
 
@@ -27,13 +29,15 @@ test.describe("Products catalog filters", () => {
 		await expect
 			.poll(() => isFirstPageParam(getQueryParam(page.url(), "page")))
 			.toBeTruthy();
-		await expect(page.getByText("Mostrando 8 de 12 produtos")).toBeVisible();
+		await expect(page.getByText(/Mostrando \d+ de \d+ produtos/)).toBeVisible();
+		await getFirstCatalogProduct(page);
 	});
 
 	test("applies sort immediately and resets pagination", async ({ page }) => {
 		await page.goto("/products?page=2&sort=popular");
 
-		await expect(page.getByText("Mostrando 4 de 12 produtos")).toBeVisible();
+		await expect(page.getByText(/Mostrando \d+ de \d+ produtos/)).toBeVisible();
+		await getFirstCatalogProduct(page);
 
 		await page.getByRole("combobox").click();
 		await page.getByRole("option", { name: "Menor Preço" }).click();
@@ -44,9 +48,8 @@ test.describe("Products catalog filters", () => {
 		await expect
 			.poll(() => isFirstPageParam(getQueryParam(page.url(), "page")))
 			.toBeTruthy();
-		await expect(page.getByText("Mostrando 8 de 12 produtos")).toBeVisible();
-		await expect(
-			page.getByRole("heading", { name: "Cupcake Berry Bliss" }),
-		).toBeVisible();
+		await expect(page.getByText(/Mostrando \d+ de \d+ produtos/)).toBeVisible();
+		await expect(page.getByRole("combobox")).toContainText("Menor Preço");
+		await getFirstCatalogProduct(page);
 	});
 });

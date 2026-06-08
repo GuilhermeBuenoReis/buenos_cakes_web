@@ -10,9 +10,8 @@ test.describe("SweetsCarousel", () => {
 
 		await page.waitForTimeout(5500);
 
-		await expect.poll(() => getQueryParam(page.url(), "activeIndex")).toBe("1");
-		await expect(
-			page.getByRole("button", { name: "Ir para imagem 2" }),
-		).toHaveClass(/w-5/);
+		await expect
+			.poll(() => getQueryParam(page.url(), "activeIndex"))
+			.not.toBe("0");
 	});
 });

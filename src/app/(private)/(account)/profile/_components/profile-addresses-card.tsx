@@ -1,9 +1,15 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import { profileAddresses } from "../_lib/profile-content";
+import { type ProfileAddress, profileAddresses } from "../_lib/profile-content";
 
-export function ProfileAddressesCard() {
+interface ProfileAddressesCardProps {
+	addresses?: readonly ProfileAddress[];
+}
+
+export function ProfileAddressesCard({
+	addresses = profileAddresses,
+}: ProfileAddressesCardProps) {
 	return (
 		<section
 			className="rounded-[2rem] border border-white/70 bg-white/94 p-6 shadow-[0_28px_70px_-52px_rgba(15,23,42,0.2)] sm:p-7"
@@ -24,7 +30,13 @@ export function ProfileAddressesCard() {
 			</div>
 
 			<div className="mt-6 grid gap-4 xl:grid-cols-2">
-				{profileAddresses.map((address) => {
+				{addresses.length === 0 ? (
+					<article className="rounded-[1.6rem] border border-dashed border-[#ddd3d3] bg-[#fcfaf8] p-5 text-sm leading-6 text-slate-500 xl:col-span-2">
+						Nenhum endereço salvo no backend ainda.
+					</article>
+				) : null}
+
+				{addresses.map((address) => {
 					return (
 						<article
 							className="rounded-[1.6rem] border border-[#f2e5e7] bg-[#fffafa] p-5"

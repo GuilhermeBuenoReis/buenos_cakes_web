@@ -1,6 +1,23 @@
+export interface ProductCustomizationOption {
+	id: string;
+	isDefault: boolean;
+	label: string;
+	priceDelta: number;
+	sortOrder: number;
+}
+
+export interface ProductSizeOption extends ProductCustomizationOption {
+	code: string;
+	servings: string;
+}
+
+export interface ProductFillingOption extends ProductCustomizationOption {}
+
 export interface Product {
 	category: string;
+	categoryId?: string;
 	description: string;
+	fillings?: ProductFillingOption[];
 	id: string;
 	image: string;
 	name: string;
@@ -8,6 +25,8 @@ export interface Product {
 	price: number;
 	rating: number;
 	reviews: number;
+	sizes?: ProductSizeOption[];
+	slug?: string;
 }
 
 export interface GetProductsRequest {

@@ -5,6 +5,7 @@ import { ProductsPagination } from "./_components/products-pagination";
 import { Sidebar } from "./_components/sidebar";
 import { ProductsCatalogProvider } from "./_context/products-catalog-context";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 export default async function ProductsPage() {

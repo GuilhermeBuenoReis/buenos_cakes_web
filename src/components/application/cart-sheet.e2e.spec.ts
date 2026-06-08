@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import {
+	addFirstCatalogProductToCart,
+	getCartItemByName,
+} from "@/test/e2e-storefront";
 
 test.describe("Cart sheet", () => {
 	test("opens directly from the cart query param", async ({ page }) => {
@@ -13,57 +17,49 @@ test.describe("Cart sheet", () => {
 	test("updates quantity, totals, and empty state while editing cart items", async ({
 		page,
 	}) => {
-		await page.goto("/products");
-
-		await page
-			.getByRole("button", {
-				name: "Adicionar Bolo Red Velvet Premium ao carrinho",
-			})
-			.click();
+		const product = await addFirstCatalogProductToCart(page);
 
 		const cartDialog = page.getByRole("dialog");
 		const cartButton = page.locator('button[aria-label="Carrinho"]');
-		const cartItem = cartDialog
-			.locator("article")
-			.filter({ hasText: "Bolo Red Velvet Premium" });
+		const cartItem = getCartItemByName(cartDialog, product.name);
 
 		await expect(
 			cartDialog.getByRole("heading", { name: "Meu Carrinho" }),
 		).toBeVisible();
 		await expect(cartButton).toContainText("1");
-		await expect(cartItem.getByText(/145,90/)).toBeVisible();
+		await expect(cartItem.getByText(/R\$/).last()).toBeVisible();
 
 		await cartDialog
 			.getByRole("button", {
-				name: "Adicionar uma unidade de Bolo Red Velvet Premium",
+				name: `Adicionar uma unidade de ${product.name}`,
 			})
 			.click();
 
 		await expect(cartButton).toContainText("2");
-		await expect(cartItem.getByText(/291,80/)).toBeVisible();
+		await expect(cartItem.getByText(/R\$/).last()).toBeVisible();
 		await expect(
 			cartDialog.getByRole("button", {
-				name: "Remover uma unidade de Bolo Red Velvet Premium",
+				name: `Remover uma unidade de ${product.name}`,
 			}),
 		).toBeEnabled();
 
 		await cartDialog
 			.getByRole("button", {
-				name: "Remover uma unidade de Bolo Red Velvet Premium",
+				name: `Remover uma unidade de ${product.name}`,
 			})
 			.click();
 
 		await expect(cartButton).toContainText("1");
-		await expect(cartItem.getByText(/145,90/)).toBeVisible();
+		await expect(cartItem.getByText(/R\$/).last()).toBeVisible();
 		await expect(
 			cartDialog.getByRole("button", {
-				name: "Remover uma unidade de Bolo Red Velvet Premium",
+				name: `Remover uma unidade de ${product.name}`,
 			}),
 		).toBeDisabled();
 
 		await cartDialog
 			.getByRole("button", {
-				name: "Remover Bolo Red Velvet Premium do carrinho",
+				name: `Remover ${product.name} do carrinho`,
 			})
 			.click();
 

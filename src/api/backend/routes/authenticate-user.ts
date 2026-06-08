@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requestBackend } from "../http-client";
+import { type BackendRouteOptions, requestBackend } from "../http-client";
 import { userSchema } from "../schemas/user";
 
 export const authenticateUserRequestSchema = z.object({
@@ -20,19 +20,16 @@ export type AuthenticateUserResponse = z.infer<
 	typeof authenticateUserResponseSchema
 >;
 
-interface AuthenticateUserOptions {
-	signal?: AbortSignal;
-}
-
 export async function authenticateUser(
 	input: AuthenticateUserRequestInput,
-	options: AuthenticateUserOptions = {},
+	options: BackendRouteOptions = {},
 ): Promise<AuthenticateUserResponse> {
 	const data = authenticateUserRequestSchema.parse(input);
 
 	return requestBackend({
 		data,
 		method: "POST",
+		headers: options.headers,
 		responseSchema: authenticateUserResponseSchema,
 		signal: options.signal,
 		url: "/api/users/login",

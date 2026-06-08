@@ -8,6 +8,7 @@ const backendApiBaseUrl =
 const nextConfig: NextConfig = {
 	distDir: process.env.NEXT_DIST_DIR ?? ".next",
 	images: {
+		unoptimized: process.env.NEXT_PUBLIC_E2E_STABLE_IMAGES === "1",
 		remotePatterns: [
 			{
 				hostname: "images.unsplash.com",
@@ -22,6 +23,14 @@ const nextConfig: NextConfig = {
 				hostname: "localhost",
 				port: "3333",
 				protocol: "http",
+			},
+			{
+				hostname: "commons.wikimedia.org",
+				protocol: "https",
+			},
+			{
+				hostname: "upload.wikimedia.org",
+				protocol: "https",
 			},
 		],
 	},

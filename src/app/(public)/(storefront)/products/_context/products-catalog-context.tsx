@@ -103,7 +103,7 @@ export function ProductsCatalogProvider({
 			const matchesCategory =
 				selectedCategory === "Todos" || product.category === selectedCategory;
 			const matchesPrice = product.price <= maxPrice;
-			const matchesRating = product.rating >= rating;
+			const matchesRating = product.reviews === 0 || product.rating >= rating;
 
 			return matchesCategory && matchesPrice && matchesRating;
 		});

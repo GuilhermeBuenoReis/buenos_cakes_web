@@ -1,5 +1,6 @@
 import { ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import { getE2EStableImageSrc } from "@/lib/e2e-stable-image";
 import { cn } from "@/lib/utils";
 
 interface CartSheetArtworkProps {
@@ -21,7 +22,13 @@ export function CartSheetArtwork({
 			)}
 		>
 			{src ? (
-				<Image alt={alt} className="object-cover" fill sizes="72px" src={src} />
+				<Image
+					alt={alt}
+					className="object-cover"
+					fill
+					sizes="72px"
+					src={getE2EStableImageSrc(src)}
+				/>
 			) : (
 				<div className="flex size-full items-center justify-center bg-rose-50 text-rose-400">
 					<ShoppingBag className="size-5" />

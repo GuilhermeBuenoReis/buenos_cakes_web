@@ -13,8 +13,18 @@ import {
 
 function getOrderStatusClassName(statusTone: ProfileOrderStatusTone) {
 	switch (statusTone) {
+		case "canceled":
+			return "bg-rose-100 text-rose-700";
+		case "completed":
+			return "bg-slate-100 text-slate-700";
 		case "confirmed":
 			return "bg-emerald-100 text-emerald-700";
+		case "pending":
+			return "bg-amber-100 text-amber-700";
+		case "preparing":
+			return "bg-sky-100 text-sky-700";
+		case "ready":
+			return "bg-violet-100 text-violet-700";
 	}
 }
 
@@ -63,7 +73,7 @@ export function ProfileRecentOrders({
 				</div>
 			) : (
 				<div className="mt-6 overflow-x-auto">
-					<table className="min-w-[760px] w-full border-separate border-spacing-y-3">
+					<table className="min-w-190 w-full border-separate border-spacing-y-3">
 						<thead>
 							<tr>
 								<th className="px-4 text-left text-[11px] font-bold tracking-[0.14em] text-slate-400 uppercase">
@@ -97,7 +107,8 @@ export function ProfileRecentOrders({
 												{order.number}
 											</p>
 											<p className="mt-1 text-sm text-slate-500">
-												{getProfileOrderItemsSummary(order.items)}
+												{order.itemsSummary ??
+													getProfileOrderItemsSummary(order.items)}
 											</p>
 										</td>
 										<td className="px-4 py-4 text-sm font-medium text-slate-600 align-top">

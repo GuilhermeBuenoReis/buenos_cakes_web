@@ -29,7 +29,7 @@ function redirectToSignIn(request: NextRequest) {
 	return NextResponse.redirect(url);
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
 	const isAuthenticated = hasAuthSession(request);
 	const isVisitingAuthRoute = isAuthRoute(request.nextUrl.pathname);
 

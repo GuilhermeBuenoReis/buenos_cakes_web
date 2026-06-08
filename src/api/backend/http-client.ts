@@ -21,6 +21,7 @@ const api = axios.create({
 		Accept: "application/json",
 	},
 	timeout: REQUEST_TIMEOUT_MS,
+	withCredentials: true,
 });
 
 export class BackendApiError extends Error {
@@ -38,6 +39,11 @@ export class BackendApiError extends Error {
 interface BackendRequestConfig<Schema extends z.ZodType>
 	extends AxiosRequestConfig {
 	responseSchema: Schema;
+}
+
+export interface BackendRouteOptions {
+	headers?: AxiosRequestConfig["headers"];
+	signal?: AbortSignal;
 }
 
 function getAxiosErrorMessage(error: AxiosError) {

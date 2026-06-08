@@ -2,10 +2,18 @@
 
 import { PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { defaultProfileCustomer } from "../_lib/profile-content";
+import {
+	defaultProfileCustomer,
+	type ProfileCustomer,
+} from "../_lib/profile-content";
 
-export function ProfilePersonalInfoCard() {
-	const customer = defaultProfileCustomer;
+interface ProfilePersonalInfoCardProps {
+	customer?: ProfileCustomer;
+}
+
+export function ProfilePersonalInfoCard({
+	customer = defaultProfileCustomer,
+}: ProfilePersonalInfoCardProps) {
 	const personalInfoItems = [
 		{ label: "Nome completo", value: customer.fullName },
 		{ label: "E-mail", value: customer.email },
