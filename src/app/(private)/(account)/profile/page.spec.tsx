@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProfilePage, { metadata } from "./page";
 
@@ -75,7 +76,7 @@ describe("ProfilePage", () => {
 	});
 
 	it("renders user, addresses and empty orders from the backend", async () => {
-		render(await ProfilePage());
+		render(<NuqsTestingAdapter>{await ProfilePage()}</NuqsTestingAdapter>);
 
 		expect(screen.getByText("Mariana Silva")).toBeVisible();
 		expect(

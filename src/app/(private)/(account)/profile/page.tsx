@@ -51,13 +51,23 @@ function toProfileCustomer(user: ApiUser): ProfileCustomer {
 function toProfileAddress(address: ApiAddress): ProfileAddress {
 	return {
 		badge: address.isDefault ? "Principal" : "Salvo",
+		city: address.city,
+		complement: address.complement ?? null,
 		details:
 			address.reference ??
 			address.complement ??
-			"Endereço cadastrado no backend.",
+			"Endereço cadastrado.",
+		houseNumber: address.houseNumber,
+		id: address.id,
+		isDefault: address.isDefault,
 		label: address.label,
 		line1: `${address.street}, ${address.houseNumber}`,
 		line2: `${address.city} • ${address.state}, ${address.zipCode}`,
+		recipientName: address.recipientName,
+		reference: address.reference ?? null,
+		state: address.state,
+		street: address.street,
+		zipCode: address.zipCode,
 	};
 }
 
@@ -81,6 +91,7 @@ function toProfileOrder(
 		items: [],
 		itemsSummary: getOrderItemsSummary(orderItems),
 		number: `#${order.id.slice(0, 8).toUpperCase()}`,
+		orderId: order.id,
 		status: orderStatusLabels[order.status],
 		statusTone: order.status,
 		total: order.total,
@@ -144,6 +155,7 @@ export default async function ProfilePage() {
 				addresses={addresses}
 				customer={toProfileCustomer(user)}
 				orders={orders}
+				userId={user.id}
 			/>
 		);
 	} catch {

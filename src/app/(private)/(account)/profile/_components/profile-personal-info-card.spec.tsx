@@ -1,10 +1,15 @@
 import { render, screen } from "@testing-library/react";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { describe, expect, it } from "vitest";
 import { ProfilePersonalInfoCard } from "./profile-personal-info-card";
 
 describe("ProfilePersonalInfoCard", () => {
 	it("renders the personal data fields and edit action", () => {
-		render(<ProfilePersonalInfoCard />);
+		render(
+			<NuqsTestingAdapter>
+				<ProfilePersonalInfoCard userId="test-user-id" />
+			</NuqsTestingAdapter>,
+		);
 
 		expect(
 			screen.getByRole("heading", { name: "Informações Pessoais" }),
@@ -15,6 +20,6 @@ describe("ProfilePersonalInfoCard", () => {
 		expect(screen.getByText("***.456.789-**")).toBeVisible();
 		expect(
 			screen.getByRole("button", { name: "Editar perfil" }),
-		).toBeDisabled();
+		).toBeVisible();
 	});
 });
