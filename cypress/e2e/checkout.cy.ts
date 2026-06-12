@@ -15,18 +15,20 @@ function formatPickupSummaryDate(date: Date) {
 }
 
 function goToCheckoutFromCart() {
-	cy.get('[role="dialog"][aria-label="Meu Carrinho"]').within(() => {
-		cy.contains("button", "Finalizar Pedido").should("be.visible");
-		cy.contains("button", "Finalizar Pedido").should("not.be.disabled");
-		cy.contains("button", "Finalizar Pedido").click();
-	});
-	cy.url().should("match", /\/checkout$/);
+	return cy
+		.get('[role="dialog"]')
+		.within(() => {
+			cy.contains("button", "Finalizar Pedido")
+				.should("be.visible")
+				.and("not.be.disabled")
+				.click();
+		})
+		.then(() => cy.url().should("match", /\/checkout$/));
 }
 
 function addCatalogProductAndGoToCheckout() {
 	return addFirstCatalogProductToCart().then((product) => {
-		goToCheckoutFromCart();
-		return product;
+		return goToCheckoutFromCart().then(() => product);
 	});
 }
 
@@ -70,7 +72,7 @@ describe("Checkout", () => {
 			.find(`button[data-day="${dayKey}"]`)
 			.click();
 
-		cy.get('[data-testid="pickup-calendar-panel"]').should("not.be.visible");
+		cy.get('[data-testid="pickup-calendar-panel"]').should("not.exist");
 		cy.get('[data-testid="pickup-date-summary"]').should(
 			"have.text",
 			formatPickupSummaryDate(calendarOnlyDate),
@@ -89,10 +91,10 @@ describe("Checkout", () => {
 
 	it("moves to the payment step when clicking next step", () => {
 		addCatalogProductAndGoToCheckout().then(() => {
-			cy.getByLabel("Nome Completo").type("Ana Beatriz Souza");
-			cy.getByLabel("E-mail").type("ana.souza@exemplo.com");
-			cy.getByLabel("WhatsApp / Telefone").type("(11) 99876-5432");
-			cy.contains("button", "Próximo Passo").click();
+			cy.fillReactInput("Nome Completo", "Ana Beatriz Souza");
+			cy.fillReactInput("E-mail", "ana.souza@exemplo.com");
+			cy.fillReactInput("WhatsApp / Telefone", "(11) 99876-5432");
+			cy.contains("button", "Próximo Passo").should("not.be.disabled").click();
 
 			cy.url().should("match", /\/checkout\/payment$/);
 			cy.contains("h1,h2,h3,h4,h5,h6", "Pagamento do Pedido").should(
@@ -111,11 +113,11 @@ describe("Checkout", () => {
 
 	it("confirms the order and makes it available in the profile page", () => {
 		addCatalogProductAndGoToCheckout().then((product) => {
-			cy.getByLabel("Nome Completo").type("Ana Beatriz Souza");
-			cy.getByLabel("E-mail").type("ana.souza@exemplo.com");
-			cy.getByLabel("WhatsApp / Telefone").type("(11) 99876-5432");
+			cy.fillReactInput("Nome Completo", "Ana Beatriz Souza");
+			cy.fillReactInput("E-mail", "ana.souza@exemplo.com");
+			cy.fillReactInput("WhatsApp / Telefone", "(11) 99876-5432");
 
-			cy.contains("button", "Próximo Passo").click();
+			cy.contains("button", "Próximo Passo").should("not.be.disabled").click();
 			cy.url().should("match", /\/checkout\/payment$/);
 
 			cy.contains("label", "Dinheiro").click();

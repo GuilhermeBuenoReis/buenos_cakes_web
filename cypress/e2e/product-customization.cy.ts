@@ -13,7 +13,7 @@ describe("Product customization", () => {
 					cy.get('[aria-label="Mensagem personalizada"]').type(
 						"Feliz aniversario!",
 					);
-					cy.contains("button", "Aumentar quantidade").click();
+					cy.get('button[aria-label="Aumentar quantidade"]').click();
 
 					if (size.count > 1) {
 						cy.url().should("include", "size=");
@@ -21,7 +21,7 @@ describe("Product customization", () => {
 					if (filling.count > 1) {
 						cy.url().should("include", "filling=");
 					}
-					cy.url().should("include", "message=Feliz%20aniversario!");
+					cy.url().should("include", "message=Feliz+aniversario!");
 					cy.url().should("include", "quantity=2");
 
 					cy.reload();
@@ -48,7 +48,7 @@ describe("Product customization", () => {
 			selectLastProductSize().then((size) => {
 				selectLastProductFilling().then((filling) => {
 					cy.get('[aria-label="Mensagem personalizada"]').type("Parabens!");
-					cy.contains("button", "Aumentar quantidade").click();
+					cy.get('button[aria-label="Aumentar quantidade"]').click();
 					cy.contains("button", "Adicionar ao Carrinho").click();
 
 					const customizedHighlight = `${size.label} • ${filling.label} • Com mensagem`;
@@ -75,7 +75,7 @@ describe("Product customization", () => {
 
 					selectProductSizeByIndex(0).then((plainSize) => {
 						cy.get('[aria-label="Mensagem personalizada"]').clear();
-						cy.contains("button", "Diminuir quantidade").click();
+						cy.get('button[aria-label="Diminuir quantidade"]').click();
 						cy.contains("button", "Adicionar ao Carrinho").click();
 
 						const plainHighlight = `${plainSize.label} • ${filling.label}`;

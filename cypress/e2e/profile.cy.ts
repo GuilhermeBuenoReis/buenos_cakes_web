@@ -7,7 +7,7 @@ describe("Profile", () => {
 			"be.visible",
 		);
 
-		cy.get('[role="banner"]').contains("a", "Produtos").click();
+		cy.get("header").contains("a", "Produtos").click();
 		cy.url().should("match", /\/products$/);
 		cy.contains("h1,h2,h3,h4,h5,h6", "Catálogo de Doces").should("be.visible");
 	});

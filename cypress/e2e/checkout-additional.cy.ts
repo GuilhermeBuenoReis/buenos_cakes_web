@@ -7,33 +7,30 @@ interface Customer {
 }
 
 function goToCheckoutFromCart() {
-	cy.get('[role="dialog"][aria-label="Meu Carrinho"]').within(() => {
-		cy.contains("button", "Finalizar Pedido").should("not.be.disabled").click();
-	});
-	cy.url().should("match", /\/checkout$/);
+	return cy
+		.get('[role="dialog"]')
+		.contains("button", "Finalizar Pedido")
+		.should("not.be.disabled")
+		.click()
+		.then(() => cy.url().should("match", /\/checkout$/));
 }
 
 function goToCheckoutPayment(customer: Customer) {
 	return addFirstCatalogProductToCart().then((product) => {
-		goToCheckoutFromCart();
-		cy.getByLabel("Nome Completo").type(customer.fullName);
-		cy.getByLabel("E-mail").type(customer.email);
-		cy.getByLabel("WhatsApp / Telefone").type(customer.phone);
-
-		cy.contains("button", "Ir para Pagamento")
-			.should("not.be.disabled")
-			.click();
-		cy.url().should("match", /\/checkout\/payment$/);
-
-		return product;
+		return goToCheckoutFromCart().then(() => {
+			cy.fillReactInput("Nome Completo", customer.fullName);
+			cy.fillReactInput("E-mail", customer.email);
+			cy.fillReactInput("WhatsApp / Telefone", customer.phone);
+			cy.contains("button", "Ir para Pagamento").should("not.be.disabled").click();
+			return cy.url().should("match", /\/checkout\/payment$/).then(() => product);
+		});
 	});
 }
 
 function goToCheckoutReview(customer: Customer) {
 	return goToCheckoutPayment(customer).then((product) => {
 		cy.contains("a", "Continuar para revisão").click();
-		cy.url().should("match", /\/checkout\/review$/);
-		return product;
+		return cy.url().should("match", /\/checkout\/review$/).then(() => product);
 	});
 }
 
@@ -45,8 +42,8 @@ describe("Checkout additional flows", () => {
 			phone: "(11) 97777-1111",
 		}).then(() => {
 			cy.contains("label", "Dinheiro").click();
-			cy.get('[aria-label="Precisa de troco?"]').should("be.visible");
-			cy.get('[aria-label="Precisa de troco?"]').type("100,00");
+			cy.getByLabel("Precisa de troco?").should("be.visible");
+			cy.getByLabel("Precisa de troco?").type("100,00");
 			cy.contains("a", "Continuar para revisão").click();
 
 			cy.url().should("match", /\/checkout\/review$/);
@@ -57,7 +54,7 @@ describe("Checkout additional flows", () => {
 
 			cy.url().should("match", /\/checkout\/payment$/);
 			cy.contains("Forma selecionada").should("be.visible");
-			cy.get('[aria-label="Precisa de troco?"]').should("have.value", "100,00");
+			cy.getByLabel("Precisa de troco?").should("have.value", "100,00");
 		});
 	});
 

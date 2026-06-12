@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Product } from "@/api/products/types";
 import { NavbarCart } from "@/components/application/navbar-cart";
 import { CartSheetProvider } from "@/contexts/cart-sheet-context";
-import { ProductCard } from "./product-card";
+import { ProductCard } from "./product-card";	
 
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({

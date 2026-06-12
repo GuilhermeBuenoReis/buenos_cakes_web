@@ -5,6 +5,7 @@ declare global {
 		interface Chainable {
 			loginAsE2EUser(): Chainable;
 			getByLabel(label: string, options?: { exact?: boolean }): Chainable;
+			fillReactInput(label: string, value: string): Chainable;
 		}
 	}
 }
@@ -63,6 +64,20 @@ Cypress.Commands.add("loginAsE2EUser", () => {
 			},
 		},
 	);
+});
+
+// React 18/19 controlled inputs don't always propagate cy.type() through
+// their synthetic onChange. This sets the value via the React nativeInputValueSetter
+// and dispatches a proper input event that React's event delegation picks up.
+Cypress.Commands.add("fillReactInput", (label: string, value: string) => {
+	cy.getByLabel(label).then(($input) => {
+		const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+			window.HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		nativeInputValueSetter?.call($input[0], value);
+		cy.wrap($input[0]).trigger("input", { bubbles: true }).trigger("blur");
+	});
 });
 
 Cypress.Commands.add(

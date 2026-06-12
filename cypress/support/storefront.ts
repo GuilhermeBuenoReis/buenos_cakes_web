@@ -48,9 +48,11 @@ export function openFirstCatalogProductDetails(): Cypress.Chainable<ProductInfo>
 			const label = $link.attr("aria-label") ?? "";
 			const detailsHref = $link.attr("href") ?? "";
 			const name = extractProductName(label);
-			cy.wrap($link).click();
-			cy.url().should("match", /\/products\/[^/?#]+/);
-			return { detailsHref, name };
+			return cy
+				.wrap($link)
+				.click()
+				.then(() => cy.url().should("match", /\/products\/[^/?#]+/))
+				.then(() => ({ detailsHref, name }));
 		});
 }
 
@@ -64,14 +66,24 @@ export function addFirstCatalogProductToCart(): Cypress.Chainable<ProductInfo> {
 			const label = $link.attr("aria-label") ?? "";
 			const detailsHref = $link.attr("href") ?? "";
 			const name = extractProductName(label);
-			cy.contains("button", `Adicionar ${name} ao carrinho`).first().click();
-			cy.get('[role="dialog"]').should("be.visible");
-			cy.get('[role="dialog"]').should("contain.text", "Meu Carrinho");
-			cy.get('[role="dialog"] article')
-				.filter(`:contains("${name}")`)
+			return cy
+				.get(`button[aria-label="Adicionar ${name} ao carrinho"]`)
 				.first()
-				.should("be.visible");
-			return { detailsHref, name };
+				.click()
+				.then(() =>
+					cy
+						.get('[role="dialog"]')
+						.should("be.visible")
+						.and("contain.text", "Meu Carrinho"),
+				)
+				.then(() =>
+					cy
+						.get('[role="dialog"] article')
+						.filter(`:contains("${name}")`)
+						.first()
+						.should("be.visible"),
+				)
+				.then(() => ({ detailsHref, name }));
 		});
 }
 
@@ -95,8 +107,7 @@ export function selectProductSizeByIndex(
 			const safeIndex = Math.min(Math.max(index, 0), count - 1);
 			const $btn = $buttons.eq(safeIndex);
 			const label = $btn.find("p").first().text().trim();
-			cy.wrap($btn).click();
-			return { count, label };
+			return cy.wrap($btn).click().then(() => ({ count, label }));
 		});
 }
 
@@ -108,8 +119,7 @@ export function selectLastProductSize(): Cypress.Chainable<SizeInfo> {
 			const count = $buttons.length;
 			const $btn = $buttons.last();
 			const label = $btn.find("p").first().text().trim();
-			cy.wrap($btn).click();
-			return { count, label };
+			return cy.wrap($btn).click().then(() => ({ count, label }));
 		});
 }
 
@@ -123,7 +133,6 @@ export function selectLastProductFilling(): Cypress.Chainable<FillingInfo> {
 			const $last = $options.last();
 			const rawLabel = $last.text();
 			const label = normalizeFilllingLabel(rawLabel);
-			cy.wrap($last).click();
-			return { count, label };
+			return cy.wrap($last).click().then(() => ({ count, label }));
 		});
 }
