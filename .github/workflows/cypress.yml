@@ -84,7 +84,7 @@ jobs:
         working-directory: buenos_cakes_web
 
       - name: Wait for servers
-        run: npx wait-on http://localhost:3333/health http://localhost:3101 --timeout 120000
+        run: pnpm dlx wait-on http://localhost:3333/health http://localhost:3101 --timeout 120000
         working-directory: buenos_cakes_web
 
       - name: Run Cypress tests
