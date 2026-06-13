@@ -21,30 +21,59 @@ export const defaultProfileCustomer: ProfileCustomer = {
 	phone: "(11) 98765-4321",
 };
 
-export const profileAddresses = [
+export const profileAddresses: ProfileAddress[] = [
 	{
 		badge: "Principal",
+		city: "São Paulo",
+		complement: null,
 		details: "Referência: portão branco ao lado da floricultura.",
+		houseNumber: "184",
+		id: "mock-address-1",
+		isDefault: true,
 		label: "Casa",
 		line1: "Rua das Camélias, 184",
 		line2: "Jardim Primavera • São Paulo, SP",
+		recipientName: "Mariana Silva",
+		reference: "Portão branco ao lado da floricultura.",
+		state: "SP",
+		street: "Rua das Camélias",
+		zipCode: "04000-000",
 	},
 	{
 		badge: "Retirada",
-		details:
-			"Usado com frequência para buscar encomendas já confirmadas no ateliê.",
+		city: "São Paulo",
+		complement: null,
+		details: "Usado com frequência para buscar encomendas já confirmadas no ateliê.",
+		houseNumber: "52",
+		id: "mock-address-2",
+		isDefault: false,
 		label: "Boutique",
 		line1: "Ateliê Buenos'Cakes • Rua das Amoras, 52",
 		line2: "Vila Mariana • São Paulo, SP",
+		recipientName: "Mariana Silva",
+		reference: null,
+		state: "SP",
+		street: "Rua das Amoras",
+		zipCode: "04101-000",
 	},
-] as const;
+];
 
 export interface ProfileAddress {
 	badge: string;
+	city: string;
+	complement: string | null;
 	details: string;
+	houseNumber: string;
+	id: string;
+	isDefault: boolean;
 	label: string;
 	line1: string;
 	line2: string;
+	recipientName: string;
+	reference: string | null;
+	state: string;
+	street: string;
+	zipCode: string;
 }
 
 export type ProfileOrderStatusTone =
@@ -61,6 +90,7 @@ export interface ProfileOrder {
 	items: CartSheetItemData[];
 	itemsSummary?: string;
 	number: string;
+	orderId: string;
 	status: string;
 	statusTone: ProfileOrderStatusTone;
 	total: number;

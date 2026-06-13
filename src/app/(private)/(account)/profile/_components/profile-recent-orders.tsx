@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { parseAsString, useQueryStates } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ import {
 	type ProfileOrderStatusTone,
 	profileOrders,
 } from "../_lib/profile-content";
+import { ProfileOrderDetailsSheet } from "./profile-order-details-sheet";
 
 function getOrderStatusClassName(statusTone: ProfileOrderStatusTone) {
 	switch (statusTone) {
@@ -35,6 +37,15 @@ interface ProfileRecentOrdersProps {
 export function ProfileRecentOrders({
 	orders = profileOrders,
 }: ProfileRecentOrdersProps) {
+	const [, setParams] = useQueryStates({
+		modal: parseAsString,
+		orderId: parseAsString,
+	});
+
+	function handleOpenDetails(order: ProfileOrder) {
+		setParams({ modal: "order-details", orderId: order.orderId });
+	}
+
 	return (
 		<section
 			className="rounded-[2rem] border border-white/70 bg-white/94 p-6 shadow-[0_28px_70px_-52px_rgba(15,23,42,0.2)] sm:p-7"
@@ -128,12 +139,13 @@ export function ProfileRecentOrders({
 											{formatPrice(order.total)}
 										</td>
 										<td className="rounded-r-[1.4rem] px-4 py-4 text-right align-top">
-											<a
+											<button
+												onClick={() => handleOpenDetails(order)}
 												className="text-sm font-semibold text-rose-500 transition hover:text-rose-600"
-												href={`#${order.id}`}
+												type="button"
 											>
 												Detalhes
-											</a>
+											</button>
 										</td>
 									</tr>
 								);
@@ -142,6 +154,8 @@ export function ProfileRecentOrders({
 					</table>
 				</div>
 			)}
+
+			<ProfileOrderDetailsSheet orders={orders} />
 		</section>
 	);
 }

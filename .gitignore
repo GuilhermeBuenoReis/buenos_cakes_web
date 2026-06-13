@@ -13,9 +13,9 @@
 # testing
 /coverage
 /blob-report/
-/playwright-report/
-/test-results/
-/test-results-*/
+/cypress/screenshots/
+/cypress/videos/
+/cypress/downloads/
 
 # next.js
 /.next/

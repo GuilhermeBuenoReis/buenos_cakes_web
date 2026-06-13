@@ -12,12 +12,14 @@ interface ProfilePageContentProps {
 	addresses: ProfileAddress[];
 	customer: ProfileCustomer;
 	orders: ProfileOrder[];
+	userId: string;
 }
 
 export function ProfilePageContent({
 	addresses,
 	customer,
 	orders,
+	userId,
 }: ProfilePageContentProps) {
 	return (
 		<section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#f8f5f6,#f4f2f1)] p-4 sm:p-5 lg:p-6">
@@ -30,9 +32,9 @@ export function ProfilePageContent({
 				<ProfileSidebar customer={customer} />
 
 				<div className="space-y-6">
-					<ProfilePersonalInfoCard customer={customer} />
+					<ProfilePersonalInfoCard customer={customer} userId={userId} />
 					<ProfileRecentOrders orders={orders} />
-					<ProfileAddressesCard addresses={addresses} />
+					<ProfileAddressesCard addresses={addresses} userId={userId} />
 				</div>
 			</div>
 		</section>

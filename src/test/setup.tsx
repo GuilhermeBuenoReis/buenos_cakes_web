@@ -35,6 +35,19 @@ vi.mock("next/image", () => ({
 	},
 }));
 
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({
+		back: vi.fn(),
+		forward: vi.fn(),
+		prefetch: vi.fn(),
+		push: vi.fn(),
+		refresh: vi.fn(),
+		replace: vi.fn(),
+	}),
+	usePathname: () => "/",
+	useSearchParams: () => new URLSearchParams(),
+}));
+
 vi.mock("next/link", () => ({
 	default: ({
 		href,

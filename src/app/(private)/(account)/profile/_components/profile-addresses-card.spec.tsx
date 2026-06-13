@@ -1,17 +1,22 @@
 import { render, screen } from "@testing-library/react";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { describe, expect, it } from "vitest";
 import { ProfileAddressesCard } from "./profile-addresses-card";
 
 describe("ProfileAddressesCard", () => {
 	it("renders the saved addresses and support copy", () => {
-		render(<ProfileAddressesCard />);
+		render(
+			<NuqsTestingAdapter>
+				<ProfileAddressesCard userId="test-user-id" />
+			</NuqsTestingAdapter>,
+		);
 
 		expect(
 			screen.getByRole("heading", { name: "Endereços salvos" }),
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				"Referências prontas para agilizar novas entregas e retiradas.",
+				"Referências prontas para agilizar entregas e retiradas.",
 			),
 		).toBeVisible();
 		expect(screen.getByText("Casa")).toBeVisible();

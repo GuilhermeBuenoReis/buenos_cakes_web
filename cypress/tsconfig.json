@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"types": ["cypress", "node"],
+		"lib": ["ES2021", "DOM", "DOM.Iterable"],
+		"isolatedModules": false
+	},
+	"exclude": ["../node_modules"],
+	"include": ["./**/*.ts"]
+}
