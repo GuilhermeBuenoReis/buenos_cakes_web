@@ -40,7 +40,8 @@ export const profileAddresses: ProfileAddress[] = [
 		badge: "Retirada",
 		city: "São Paulo",
 		complement: null,
-		details: "Usado com frequência para buscar encomendas já confirmadas no ateliê.",
+		details:
+			"Usado com frequência para buscar encomendas já confirmadas no ateliê.",
 		houseNumber: "52",
 		id: "mock-address-2",
 		isDefault: false,
@@ -118,6 +119,25 @@ export function getProfileInitials(name: string) {
 	const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
 
 	return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+}
+
+export function getProfileOrderStatusClassName(
+	statusTone: ProfileOrderStatusTone,
+) {
+	switch (statusTone) {
+		case "canceled":
+			return "bg-rose-100 text-rose-700";
+		case "completed":
+			return "bg-slate-100 text-slate-700";
+		case "confirmed":
+			return "bg-emerald-100 text-emerald-700";
+		case "pending":
+			return "bg-amber-100 text-amber-700";
+		case "preparing":
+			return "bg-sky-100 text-sky-700";
+		case "ready":
+			return "bg-violet-100 text-violet-700";
+	}
 }
 
 export function getProfileOrderItemsSummary(items: ProfileOrder["items"]) {

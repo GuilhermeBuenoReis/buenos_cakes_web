@@ -1,21 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	CircleDollarSign,
-	Cookie,
-	CupSoda,
-	Gift,
-	LayoutGrid,
-} from "lucide-react";
+import { CircleDollarSign } from "lucide-react";
 import Link from "next/link";
-import type { MouseEvent } from "react";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProductsCatalog } from "../_context/products-catalog-context";
+import { SidebarCategoryList } from "./sidebar-category-list";
+import { SidebarRatingFilter } from "./sidebar-rating-filter";
 
 const sidebarFiltersSchema = z.object({
 	maxPrice: z.number().int().min(0).max(250),
@@ -24,25 +19,9 @@ const sidebarFiltersSchema = z.object({
 
 type SidebarFilters = z.infer<typeof sidebarFiltersSchema>;
 
-function getCategoryIcon(label: string) {
-	if (label === "Bolos") return CupSoda;
-	if (label === "Cookies") return Cookie;
-	if (label === "Doces Finos") return Gift;
-	if (label === "Padaria") return Gift;
-	return LayoutGrid;
-}
-
 export function Sidebar() {
-	const {
-		categories,
-		maxPrice,
-		rating,
-		selectedCategory,
-		setCurrentPage,
-		setMaxPrice,
-		setRating,
-		setSelectedCategory,
-	} = useProductsCatalog();
+	const { maxPrice, rating, setCurrentPage, setMaxPrice, setRating } =
+		useProductsCatalog();
 	const {
 		handleSubmit,
 		register,
@@ -71,29 +50,14 @@ export function Sidebar() {
 		});
 	}, [maxPrice, rating, reset]);
 
-	function handleCategoryButtonClick(event: MouseEvent<HTMLButtonElement>) {
-		const nextCategory = event.currentTarget.dataset.category;
-		if (!nextCategory) return;
-		setSelectedCategory(nextCategory);
-		setCurrentPage(1);
-	}
-
 	function handleApplyFiltersSubmit(values: SidebarFilters) {
 		setMaxPrice(values.maxPrice);
 		setRating(values.rating);
 		setCurrentPage(1);
 	}
 
-	function handleFourStarRatingChange() {
-		setValue("rating", 4, {
-			shouldDirty: true,
-			shouldTouch: true,
-			shouldValidate: true,
-		});
-	}
-
-	function handleThreeStarRatingChange() {
-		setValue("rating", 3, {
+	function handleRatingSelect(nextRating: 3 | 4) {
+		setValue("rating", nextRating, {
 			shouldDirty: true,
 			shouldTouch: true,
 			shouldValidate: true,
@@ -118,45 +82,7 @@ export function Sidebar() {
 					</Link>
 				</div>
 
-				<section className="space-y-2 rounded-lg border border-rose-100/70 bg-white/75 p-2">
-					<h2 className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-						<LayoutGrid className="h-4 w-4 text-rose-500" />
-						Categorias
-					</h2>
-
-					<div className="space-y-0.5">
-						{categories.map((category) => {
-							const Icon = getCategoryIcon(category.label);
-							const isActive = selectedCategory === category.label;
-
-							return (
-								<button
-									type="button"
-									key={category.label}
-									data-category={category.label}
-									onClick={handleCategoryButtonClick}
-									className="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-left text-xs transition hover:bg-slate-50"
-								>
-									<span
-										className={`inline-flex items-center gap-2 ${
-											isActive
-												? "font-bold text-slate-800"
-												: "font-medium text-slate-500"
-										}`}
-									>
-										<Icon className="h-3 w-3 text-slate-400" />
-										{category.label}
-									</span>
-									<span
-										className={`text-[10px] ${isActive ? "font-bold text-slate-600" : "text-slate-400"}`}
-									>
-										{category.count}
-									</span>
-								</button>
-							);
-						})}
-					</div>
-				</section>
+				<SidebarCategoryList />
 
 				<section className="space-y-2 rounded-lg border border-rose-100/70 bg-white/75 p-2">
 					<h2 className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
@@ -184,42 +110,10 @@ export function Sidebar() {
 					</div>
 				</section>
 
-				<section className="space-y-2 rounded-lg border border-rose-100/70 bg-white/75 p-2">
-					<h2 className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-						<span className="text-rose-500">★</span>
-						Avaliação
-					</h2>
-
-					<div className="space-y-1 text-xs">
-						<div className="flex items-center gap-1.5">
-							<Input
-								type="radio"
-								name="rating"
-								value={4}
-								checked={watchedRating === 4}
-								onChange={handleFourStarRatingChange}
-								aria-label="Avaliação mínima de 4 estrelas"
-								className="h-3 w-3 appearance-auto border-0 bg-transparent p-0 accent-rose-500 shadow-none focus-visible:ring-0"
-							/>
-							<span className="text-rose-500">★★★★★</span>
-							<span className="text-[11px] text-slate-600">4.0 ou mais</span>
-						</div>
-
-						<div className="flex items-center gap-1.5">
-							<Input
-								type="radio"
-								name="rating"
-								value={3}
-								checked={watchedRating === 3}
-								onChange={handleThreeStarRatingChange}
-								aria-label="Avaliação mínima de 3 estrelas"
-								className="h-3 w-3 appearance-auto border-0 bg-transparent p-0 accent-rose-500 shadow-none focus-visible:ring-0"
-							/>
-							<span className="text-rose-500">★★★★☆</span>
-							<span className="text-[11px] text-slate-600">3.0 ou mais</span>
-						</div>
-					</div>
-				</section>
+				<SidebarRatingFilter
+					onSelect={handleRatingSelect}
+					value={watchedRating}
+				/>
 
 				<Button
 					className="mt-auto w-full rounded-lg text-xs"

@@ -2,7 +2,6 @@
 
 import { MapPin, ReceiptText } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { CartSheetArtwork } from "@/components/application/cart-sheet-artwork";
 import { Button } from "@/components/ui/button";
 import { useCartSheet } from "@/contexts/cart-sheet-context";
 import { formatPrice } from "@/lib/format-price";
@@ -11,6 +10,7 @@ import { useCheckoutPickup } from "../_context/checkout-pickup-context";
 import { isCheckoutPersonalInfoValid } from "../_lib/checkout-personal-info";
 import { formatPickupSummaryDate } from "../_lib/checkout-pickup";
 import { CheckoutCard } from "./checkout-card";
+import { CheckoutSummaryItem } from "./checkout-summary-item";
 
 const checkoutOrderSummaryDisclaimer =
 	"Ao finalizar, você concorda com nossos Termos de Serviço e Política de Cancelamento.";
@@ -52,32 +52,7 @@ export function CheckoutOrderSummary() {
 				{hasItems ? (
 					<div className="mt-6 space-y-3.5">
 						{items.map((item) => (
-							<article
-								className="flex items-center gap-3 rounded-[1.45rem] border border-[#ece4e4] bg-[#fffaf9] p-3.5 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.16)]"
-								key={item.id}
-							>
-								<CartSheetArtwork
-									alt={`Imagem de ${item.name} no checkout`}
-									className="size-16 rounded-[1.1rem]"
-									src={item.image}
-								/>
-
-								<div className="min-w-0 flex-1">
-									<h3 className="truncate text-sm font-extrabold tracking-[0.01em] text-slate-900">
-										{item.name}
-									</h3>
-									<p className="mt-1 text-xs font-semibold text-slate-500">
-										Qtd. {item.quantity}
-									</p>
-									<p className="mt-1 truncate text-xs font-semibold text-rose-400">
-										{item.highlight}
-									</p>
-								</div>
-
-								<strong className="text-sm font-extrabold text-slate-900">
-									{formatPrice(item.quantity * item.unitPrice)}
-								</strong>
-							</article>
+							<CheckoutSummaryItem item={item} key={item.id} />
 						))}
 					</div>
 				) : (

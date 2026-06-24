@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 export default async function ProductsPage() {
-	const products = await getProducts({ revalidateInSeconds: revalidate });
+	const products = await getProducts();
 
 	return (
 		<ProductsCatalogProvider products={products}>

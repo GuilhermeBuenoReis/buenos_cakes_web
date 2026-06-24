@@ -21,10 +21,7 @@ export async function generateMetadata({
 	params,
 }: ProductDetailsPageProps): Promise<Metadata> {
 	const { id } = await params;
-	const product = await getProductById({
-		id,
-		revalidateInSeconds: revalidate,
-	});
+	const product = await getProductById({ id });
 
 	if (!product) {
 		return {

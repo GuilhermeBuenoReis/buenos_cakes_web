@@ -55,7 +55,6 @@ describe("ProductDetailsPage", () => {
 
 		expect(mocks.getProductById).toHaveBeenCalledWith({
 			id: baseProduct.id,
-			revalidateInSeconds: 300,
 		});
 	});
 

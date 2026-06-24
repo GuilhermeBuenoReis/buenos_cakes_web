@@ -3,61 +3,27 @@
 import { CalendarDays, Clock3 } from "lucide-react";
 import type { ChangeEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { ptBR } from "react-day-picker/locale";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { dayjs, getCalendarDayKey } from "@/lib/dayjs";
-import { cn } from "@/lib/utils";
 import { useCheckoutPickup } from "../_context/checkout-pickup-context";
 import {
 	formatPickupSummaryDate,
 	getInitialPickupDate,
+	getPickupCalendarRange,
+	getQuickPickDates,
+	pickupEndTime,
+	pickupStartTime,
+	pickupStepInSeconds,
 } from "../_lib/checkout-pickup";
-
-const pickupEndTime = "18:30";
-const pickupStartTime = "09:00";
-const pickupStepInSeconds = 1800;
-const quickPickDays = 7;
+import { CheckoutPickupCalendarPanel } from "./checkout-pickup-calendar-panel";
+import { CheckoutPickupDayButton } from "./checkout-pickup-day-button";
 
 export {
 	defaultPickupTime,
 	formatPickupSummaryDate,
 	getInitialPickupDate,
 } from "../_lib/checkout-pickup";
-
-function capitalize(value: string) {
-	return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function getQuickPickDates(baseDate: Date) {
-	return Array.from({ length: quickPickDays }, (_, index) =>
-		dayjs(baseDate).add(index, "day").toDate(),
-	);
-}
-
-function getPickupCalendarRange(baseDate: Date) {
-	const nextWeekBaseDate = dayjs(baseDate).add(1, "week");
-	const daysUntilWeekEnd =
-		nextWeekBaseDate.day() === 0 ? 0 : 7 - nextWeekBaseDate.day();
-
-	return {
-		from: baseDate,
-		to: nextWeekBaseDate.add(daysUntilWeekEnd, "day").endOf("day").toDate(),
-	};
-}
-
-function formatWeekButtonLabel(date: Date) {
-	if (dayjs(date).isSame(dayjs(), "day")) {
-		return "Hoje";
-	}
-
-	return capitalize(dayjs(date).format("ddd").replace(".", ""));
-}
-
-function formatMonthLabel(date: Date) {
-	return dayjs(date).format("MMM").replace(".", "").toUpperCase();
-}
 
 export function CheckoutPickupScheduler() {
 	const { pickupDate, pickupTime, setPickupDate, setPickupTime } =
@@ -82,7 +48,7 @@ export function CheckoutPickupScheduler() {
 		dayjs(date).isSame(pickupDate, "day"),
 	);
 
-	function handleQuickPickDateClick(date: Date) {
+	function handleQuickPickDateSelect(date: Date) {
 		setPickupDate(date);
 		setIsCalendarOpen(false);
 	}
@@ -113,56 +79,14 @@ export function CheckoutPickupScheduler() {
 				</div>
 
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
-					{quickPickDates.map((date) => {
-						const isSelected = dayjs(date).isSame(pickupDate, "day");
-
-						function handleQuickPickButtonClick() {
-							handleQuickPickDateClick(date);
-						}
-
-						return (
-							<button
-								type="button"
-								aria-label={`Selecionar retirada em ${formatPickupSummaryDate(date)}`}
-								aria-pressed={isSelected}
-								className={cn(
-									"min-h-30 rounded-[1.4rem] border px-3 py-3.5 text-center transition-all",
-									isSelected
-										? "border-rose-300 bg-[#fff2f4] text-slate-900 shadow-[0_18px_30px_-26px_rgba(216,98,126,0.28)]"
-										: "border-[#ece4e4] bg-[#fffdfb] text-slate-600 hover:border-rose-200 hover:bg-[#fff8f8]",
-								)}
-								key={getCalendarDayKey(date)}
-								onClick={handleQuickPickButtonClick}
-							>
-								<div
-									className={cn(
-										"text-[10px] font-bold tracking-[0.16em] uppercase",
-										isSelected ? "text-rose-500" : "text-slate-400",
-									)}
-								>
-									{formatWeekButtonLabel(date)}
-								</div>
-								<div
-									className={cn(
-										"mx-auto mt-3 flex size-11 items-center justify-center rounded-full text-lg font-extrabold leading-none",
-										isSelected
-											? "bg-rose-500 text-white"
-											: "bg-[#f5f0f0] text-slate-700",
-									)}
-								>
-									{dayjs(date).format("DD")}
-								</div>
-								<div
-									className={cn(
-										"mt-3 text-[11px] font-semibold uppercase",
-										isSelected ? "text-slate-700" : "text-slate-400",
-									)}
-								>
-									{formatMonthLabel(date)}
-								</div>
-							</button>
-						);
-					})}
+					{quickPickDates.map((date) => (
+						<CheckoutPickupDayButton
+							key={getCalendarDayKey(date)}
+							date={date}
+							isSelected={dayjs(date).isSame(pickupDate, "day")}
+							onSelect={handleQuickPickDateSelect}
+						/>
+					))}
 				</div>
 
 				<div className="rounded-[1.6rem] border border-[#efe2e3] bg-[#fff9f8] p-4 shadow-[0_16px_36px_-30px_rgba(15,23,42,0.14)] sm:p-5">
@@ -195,28 +119,12 @@ export function CheckoutPickupScheduler() {
 				</div>
 
 				{isCalendarOpen ? (
-					<div
-						className="rounded-[1.75rem] border border-[#ebe3e3] bg-[#fffdfb] p-3 shadow-[0_20px_42px_-36px_rgba(15,23,42,0.16)]"
-						data-testid="pickup-calendar-panel"
-					>
-						<Calendar
-							mode="single"
-							selected={pickupDate}
-							onSelect={handleCalendarDateSelect}
-							buttonVariant="ghost"
-							className="w-full rounded-[1.4rem] bg-[#fffdfa] p-4 [--cell-size:2.65rem] sm:[--cell-size:2.85rem]"
-							disabled={(date) =>
-								dayjs(date).isBefore(pickupRange.from, "day") ||
-								dayjs(date).isAfter(pickupRange.to, "day")
-							}
-							locale={ptBR}
-							timeZone={timeZone}
-						/>
-
-						<p className="px-2 pb-2 text-xs font-medium text-slate-500">
-							Disponível somente entre hoje e a próxima semana.
-						</p>
-					</div>
+					<CheckoutPickupCalendarPanel
+						onSelect={handleCalendarDateSelect}
+						range={pickupRange}
+						selectedDate={pickupDate}
+						timeZone={timeZone}
+					/>
 				) : null}
 			</div>
 

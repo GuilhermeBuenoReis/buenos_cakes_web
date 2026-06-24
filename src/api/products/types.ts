@@ -29,20 +29,10 @@ export interface Product {
 	slug?: string;
 }
 
-export interface GetProductsRequest {
-	revalidateInSeconds?: number;
-}
-
 export type GetProductsResponse = Product[];
 
 export interface GetProductByIdRequest {
 	id: Product["id"];
-	revalidateInSeconds?: number;
 }
 
 export type GetProductByIdResponse = Product | null;
-
-export interface ProductsApiErrorResponse {
-	message: string;
-	status: number;
-}

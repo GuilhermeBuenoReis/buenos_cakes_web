@@ -117,24 +117,15 @@ export function CartSheetContent() {
 						<span className="text-rose-500">{formatPrice(total)}</span>
 					</div>
 
-					{hasItems ? (
-						<Button
-							className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
-							onClick={handleCheckoutButtonClick}
-							type="button"
-						>
-							Finalizar Pedido
-							<ArrowRight className="size-3.5" />
-						</Button>
-					) : (
-						<Button
-							className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
-							disabled
-						>
-							Finalizar Pedido
-							<ArrowRight className="size-3.5" />
-						</Button>
-					)}
+					<Button
+						className="h-11 rounded-full text-sm font-extrabold shadow-[0_14px_24px_rgba(244,63,94,0.18)]"
+						disabled={!hasItems}
+						onClick={handleCheckoutButtonClick}
+						type="button"
+					>
+						Finalizar Pedido
+						<ArrowRight className="size-3.5" />
+					</Button>
 
 					<Link
 						className="text-[13px] font-medium text-slate-400 transition hover:text-slate-700"

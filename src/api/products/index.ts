@@ -21,7 +21,6 @@ import {
 import type {
 	GetProductByIdRequest,
 	GetProductByIdResponse,
-	GetProductsRequest,
 	GetProductsResponse,
 	Product,
 	ProductFillingOption,
@@ -145,7 +144,7 @@ const getCategoriesById = cache(async () => {
 });
 
 export const getProducts = cache(
-	async (_request: GetProductsRequest = {}): Promise<GetProductsResponse> => {
+	async (): Promise<GetProductsResponse> => {
 		const [products, categoriesById] = await Promise.all([
 			listAllActiveProducts(),
 			getCategoriesById(),
@@ -183,7 +182,3 @@ export const getProductById = cache(
 		}
 	},
 );
-
-export function getProductIds(): Product["id"][] {
-	return [];
-}
