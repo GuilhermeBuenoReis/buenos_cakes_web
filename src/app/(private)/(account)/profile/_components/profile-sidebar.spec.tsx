@@ -8,9 +8,7 @@ describe("ProfileSidebar", () => {
 
 		expect(screen.getByText("Mariana Silva")).toBeVisible();
 		expect(screen.getByText("Cliente desde 2023")).toBeVisible();
-		expect(
-			screen.getByRole("img", { name: "Foto de perfil de Mariana Silva" }),
-		).toBeVisible();
+		expect(screen.getByText("MS")).toBeVisible();
 		expect(screen.getByRole("link", { name: "Meu Perfil" })).toHaveAttribute(
 			"href",
 			"#profile-personal-info",

@@ -1,11 +1,11 @@
 "use client";
 
 import { LogOut, MapPin, Package2, UserRound } from "lucide-react";
-import Image from "next/image";
-import { getE2EStableImageSrc } from "@/lib/e2e-stable-image";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import {
 	defaultProfileCustomer,
+	getProfileInitials,
 	type ProfileCustomer,
 } from "../_lib/profile-content";
 
@@ -40,16 +40,14 @@ export function ProfileSidebar({
 	return (
 		<aside className="rounded-[2rem] border border-white/70 bg-white/92 p-5 shadow-[0_28px_70px_-50px_rgba(15,23,42,0.18)] backdrop-blur-sm sm:p-6">
 			<div className="flex items-center gap-3">
-				<div className="relative size-15 overflow-hidden rounded-full ring-2 ring-white shadow-[0_16px_34px_-24px_rgba(15,23,42,0.4)]">
-					<Image
-						alt={`Foto de perfil de ${customer.displayName}`}
-						className="object-cover"
-						fill
-						priority
-						sizes="60px"
-						src={getE2EStableImageSrc(customer.avatar)}
-					/>
-				</div>
+				<Avatar
+					aria-label={`Avatar de ${customer.displayName}`}
+					className="size-15 ring-2 ring-white shadow-[0_16px_34px_-24px_rgba(15,23,42,0.4)]"
+				>
+					<AvatarFallback className="bg-[#ff4b61] text-base font-black text-white">
+						{getProfileInitials(customer.displayName)}
+					</AvatarFallback>
+				</Avatar>
 
 				<div className="min-w-0">
 					<h2 className="truncate text-lg font-black tracking-tight text-slate-950">

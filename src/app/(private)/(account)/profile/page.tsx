@@ -24,9 +24,6 @@ export const metadata: Metadata = {
 	title: "Meu Perfil | Buenos'Cakes",
 };
 
-const profileAvatarUrl =
-	"https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80";
-
 const orderStatusLabels: Record<ApiOrderStatus, string> = {
 	canceled: "Cancelado",
 	completed: "Concluído",
@@ -38,7 +35,6 @@ const orderStatusLabels: Record<ApiOrderStatus, string> = {
 
 function toProfileCustomer(user: ApiUser): ProfileCustomer {
 	return {
-		avatar: profileAvatarUrl,
 		cpf: user.cpf ?? "Não informado",
 		displayName: getProfileDisplayName(user.name),
 		email: user.email,

@@ -1,7 +1,6 @@
 import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
 
 export interface ProfileCustomer {
-	avatar: string;
 	cpf: string;
 	displayName: string;
 	email: string;
@@ -11,8 +10,6 @@ export interface ProfileCustomer {
 }
 
 export const defaultProfileCustomer: ProfileCustomer = {
-	avatar:
-		"https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
 	cpf: "***.456.789-**",
 	displayName: "Mariana Silva",
 	email: "mariana.silva@email.com.br",
@@ -105,6 +102,22 @@ export function getProfileDisplayName(fullName: string) {
 		.filter(Boolean);
 
 	return [firstName, lastName].filter(Boolean).join(" ") || fullName;
+}
+
+export function getProfileInitials(name: string) {
+	const parts = name
+		.split(" ")
+		.map((part) => part.trim())
+		.filter(Boolean);
+
+	if (parts.length === 0) {
+		return "";
+	}
+
+	const firstName = parts[0];
+	const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
+
+	return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
 export function getProfileOrderItemsSummary(items: ProfileOrder["items"]) {
