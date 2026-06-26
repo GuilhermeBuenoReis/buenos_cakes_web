@@ -18,8 +18,6 @@ describe("ProfilePersonalInfoCard", () => {
 		expect(screen.getByText("mariana.silva@email.com.br")).toBeVisible();
 		expect(screen.getByText("(11) 98765-4321")).toBeVisible();
 		expect(screen.getByText("***.456.789-**")).toBeVisible();
-		expect(
-			screen.getByRole("button", { name: "Editar perfil" }),
-		).toBeVisible();
+		expect(screen.getByRole("button", { name: "Editar perfil" })).toBeVisible();
 	});
 });

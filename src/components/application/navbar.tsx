@@ -3,6 +3,11 @@
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import type { ApiUser } from "@/api/backend/schemas/user";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getStoredAuthUser } from "@/lib/auth/browser-session";
+import { getInitials } from "@/lib/get-initials";
 import { cn } from "@/lib/utils";
 import { NavbarCart } from "./navbar-cart";
 
@@ -23,14 +28,21 @@ function isNavItemActive(pathname: string, href: string) {
 export function Navbar() {
 	const pathname = usePathname();
 	const isProfileActive = isNavItemActive(pathname, "/profile");
+	const [authUser, setAuthUser] = useState<ApiUser | null>(null);
+
+	useEffect(() => {
+		setAuthUser(getStoredAuthUser());
+	}, []);
+
+	const initials = authUser ? getInitials(authUser.name) : null;
 
 	return (
 		<header className="rounded-2xl bg-white px-6 py-5 shadow-sm sm:px-8">
 			<div className="flex items-center justify-between gap-4">
 				<Link href="/dashboard" className="flex items-center gap-2.5">
 					<div className="text-lg leading-none font-bold tracking-tight">
-						<span className="text-[#1f2937]">Doce</span>
-						<span className="text-[#ff4b61]">Gestão</span>
+						<span className="text-[#1f2937]">Buenos</span>
+						<span className="text-[#ff4b61]">Cakes</span>
 					</div>
 				</Link>
 
@@ -61,13 +73,26 @@ export function Navbar() {
 					<Link
 						aria-label="Perfil"
 						aria-current={isProfileActive ? "page" : undefined}
-						className={cn(
-							"flex size-10 items-center justify-center rounded-full border border-[#f2e7ea] bg-[#fff6f7] text-[#4b5563] transition hover:border-rose-200 hover:text-[#ff4b61]",
-							isProfileActive && "border-rose-200 text-[#ff4b61]",
-						)}
+						className="rounded-full transition"
 						href="/profile"
 					>
-						<User className="h-5 w-5" />
+						<Avatar
+							className={cn(
+								"size-10 border border-[#f2e7ea] transition hover:border-rose-200",
+								isProfileActive && "border-rose-200",
+							)}
+						>
+							<AvatarFallback
+								className={cn(
+									"text-sm font-bold transition",
+									initials
+										? "bg-[#ff4b61] font-black text-white"
+										: "bg-[#fff6f7] text-[#4b5563]",
+								)}
+							>
+								{initials ?? <User className="h-5 w-5" />}
+							</AvatarFallback>
+						</Avatar>
 					</Link>
 				</div>
 			</div>

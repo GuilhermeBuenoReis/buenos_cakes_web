@@ -1,4 +1,5 @@
 import type { CartSheetItemData } from "@/contexts/cart-sheet-context";
+import { getInitials } from "@/lib/get-initials";
 
 export interface ProfileCustomer {
 	cpf: string;
@@ -89,6 +90,7 @@ export interface ProfileOrder {
 	itemsSummary?: string;
 	number: string;
 	orderId: string;
+	scheduledAt: string | null;
 	status: string;
 	statusTone: ProfileOrderStatusTone;
 	total: number;
@@ -106,19 +108,7 @@ export function getProfileDisplayName(fullName: string) {
 }
 
 export function getProfileInitials(name: string) {
-	const parts = name
-		.split(" ")
-		.map((part) => part.trim())
-		.filter(Boolean);
-
-	if (parts.length === 0) {
-		return "";
-	}
-
-	const firstName = parts[0];
-	const lastName = parts.length > 1 ? parts[parts.length - 1] : "";
-
-	return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+	return getInitials(name);
 }
 
 export function getProfileOrderStatusClassName(

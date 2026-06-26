@@ -2,22 +2,37 @@
 
 import Link from "next/link";
 import { parseAsString, useQueryStates } from "nuqs";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { type ProfileOrder, profileOrders } from "../_lib/profile-content";
 import { ProfileOrderDetailsSheet } from "./profile-order-details-sheet";
 import { ProfileOrderRow } from "./profile-order-row";
+import { ProfileOrdersPagination } from "./profile-orders-pagination";
+
+const ORDERS_PER_PAGE = 5;
 
 interface ProfileRecentOrdersProps {
+	customerEmail?: string | null;
 	orders?: ProfileOrder[];
 }
 
 export function ProfileRecentOrders({
+	customerEmail = null,
 	orders = profileOrders,
 }: ProfileRecentOrdersProps) {
 	const [, setParams] = useQueryStates({
 		modal: parseAsString,
 		orderId: parseAsString,
 	});
+	const [currentPage, setCurrentPage] = useState(1);
+
+	const totalPages = Math.max(1, Math.ceil(orders.length / ORDERS_PER_PAGE));
+	const safeCurrentPage = Math.min(currentPage, totalPages);
+	const pageStartIndex = (safeCurrentPage - 1) * ORDERS_PER_PAGE;
+	const paginatedOrders = orders.slice(
+		pageStartIndex,
+		pageStartIndex + ORDERS_PER_PAGE,
+	);
 
 	function handleOpenDetails(order: ProfileOrder) {
 		setParams({ modal: "order-details", orderId: order.orderId });
@@ -61,7 +76,7 @@ export function ProfileRecentOrders({
 				</div>
 			) : (
 				<div className="mt-6 overflow-x-auto">
-					<table className="min-w-190 w-full border-separate border-spacing-y-3">
+					<table className="w-full min-w-120 border-separate border-spacing-y-3">
 						<thead>
 							<tr>
 								<th className="px-4 text-left text-[11px] font-bold tracking-[0.14em] text-slate-400 uppercase">
@@ -83,7 +98,7 @@ export function ProfileRecentOrders({
 						</thead>
 
 						<tbody>
-							{orders.map((order) => (
+							{paginatedOrders.map((order) => (
 								<ProfileOrderRow
 									key={order.id}
 									onOpenDetails={handleOpenDetails}
@@ -95,7 +110,15 @@ export function ProfileRecentOrders({
 				</div>
 			)}
 
-			<ProfileOrderDetailsSheet orders={orders} />
+			{totalPages > 1 ? (
+				<ProfileOrdersPagination
+					currentPage={safeCurrentPage}
+					onPageChange={setCurrentPage}
+					totalPages={totalPages}
+				/>
+			) : null}
+
+			<ProfileOrderDetailsSheet customerEmail={customerEmail} orders={orders} />
 		</section>
 	);
 }

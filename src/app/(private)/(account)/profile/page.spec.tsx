@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QueryProvider } from "@/components/application/query-provider";
 import ProfilePage, { metadata } from "./page";
 
 const mocks = vi.hoisted(() => ({
@@ -76,7 +77,11 @@ describe("ProfilePage", () => {
 	});
 
 	it("renders user, addresses and empty orders from the backend", async () => {
-		render(<NuqsTestingAdapter>{await ProfilePage()}</NuqsTestingAdapter>);
+		render(
+			<QueryProvider>
+				<NuqsTestingAdapter>{await ProfilePage()}</NuqsTestingAdapter>
+			</QueryProvider>,
+		);
 
 		expect(screen.getByText("Mariana Silva")).toBeVisible();
 		expect(

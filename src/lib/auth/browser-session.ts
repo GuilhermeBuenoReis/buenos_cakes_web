@@ -1,4 +1,4 @@
-import type { ApiUser } from "@/api/backend/schemas/user";
+import { type ApiUser, userSchema } from "@/api/backend/schemas/user";
 import {
 	AUTH_SESSION_COOKIE_NAME,
 	AUTH_SESSION_COOKIE_VALUE,
@@ -43,6 +43,26 @@ export function getStoredAccessToken() {
 	}
 
 	return window.localStorage.getItem(authSessionStorageKeys.accessToken);
+}
+
+export function getStoredAuthUser(): ApiUser | null {
+	if (!canUseBrowserSession()) {
+		return null;
+	}
+
+	const storedUser = window.localStorage.getItem(authSessionStorageKeys.user);
+
+	if (!storedUser) {
+		return null;
+	}
+
+	try {
+		const parsedUser = userSchema.safeParse(JSON.parse(storedUser));
+
+		return parsedUser.success ? parsedUser.data : null;
+	} catch {
+		return null;
+	}
 }
 
 export function persistAuthSession({ accessToken, user }: AuthSession) {

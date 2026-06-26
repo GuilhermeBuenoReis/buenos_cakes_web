@@ -1,4 +1,14 @@
 export type {
+	AddOrderItemRequestInput,
+	AddOrderItemResponse,
+} from "./routes/add-order-item";
+export { addOrderItem } from "./routes/add-order-item";
+export type {
+	ChangeOrderItemRequestInput,
+	ChangeOrderItemResponse,
+} from "./routes/change-order-item";
+export { changeOrderItem } from "./routes/change-order-item";
+export type {
 	CreateAddressRequestInput,
 	CreateAddressResponse,
 } from "./routes/create-address";
@@ -27,6 +37,11 @@ export type {
 	ListUserOrdersResponse,
 } from "./routes/list-user-orders";
 export { listUserOrders } from "./routes/list-user-orders";
+export type {
+	RemoveOrderItemRequestInput,
+	RemoveOrderItemResponse,
+} from "./routes/remove-order-item";
+export { removeOrderItem } from "./routes/remove-order-item";
 export type {
 	SetDefaultAddressRequestInput,
 	SetDefaultAddressResponse,

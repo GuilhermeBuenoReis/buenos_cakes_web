@@ -8,11 +8,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import {
-	formatCpfCnpj,
-	formatPhone,
-	stripMask,
-} from "@/lib/format-document";
+import { formatCpfCnpj, formatPhone, stripMask } from "@/lib/format-document";
 import {
 	defaultProfileCustomer,
 	type ProfileCustomer,
@@ -86,8 +82,7 @@ export function ProfilePersonalInfoCard({
 
 				<div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
 					{fields.map((field) => {
-						const isEmpty =
-							!field.value || field.value === "Não informado";
+						const isEmpty = !field.value || field.value === "Não informado";
 
 						if (field.isEmail && !isEmpty) {
 							return (

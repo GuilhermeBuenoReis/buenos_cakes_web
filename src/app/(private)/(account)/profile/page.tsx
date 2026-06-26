@@ -49,10 +49,7 @@ function toProfileAddress(address: ApiAddress): ProfileAddress {
 		badge: address.isDefault ? "Principal" : "Salvo",
 		city: address.city,
 		complement: address.complement ?? null,
-		details:
-			address.reference ??
-			address.complement ??
-			"Endereço cadastrado.",
+		details: address.reference ?? address.complement ?? "Endereço cadastrado.",
 		houseNumber: address.houseNumber,
 		id: address.id,
 		isDefault: address.isDefault,
@@ -88,6 +85,7 @@ function toProfileOrder(
 		itemsSummary: getOrderItemsSummary(orderItems),
 		number: `#${order.id.slice(0, 8).toUpperCase()}`,
 		orderId: order.id,
+		scheduledAt: order.pickupScheduledAt ?? null,
 		status: orderStatusLabels[order.status],
 		statusTone: order.status,
 		total: order.total,
@@ -113,8 +111,13 @@ async function safeListUserOrders(
 ) {
 	try {
 		const response = await listUserOrders({ page: 1, userId }, { headers });
+		const ordersByMostRecent = [...response.orders].sort(
+			(firstOrder, secondOrder) =>
+				dayjs(secondOrder.createdAt).valueOf() -
+				dayjs(firstOrder.createdAt).valueOf(),
+		);
 		const orderItemsByOrder = await Promise.all(
-			response.orders.map(async (order) => {
+			ordersByMostRecent.map(async (order) => {
 				try {
 					const itemsResponse = await listOrderItemsByOrder(
 						{ orderId: order.id },
@@ -128,7 +131,7 @@ async function safeListUserOrders(
 			}),
 		);
 
-		return response.orders.map((order, index) =>
+		return ordersByMostRecent.map((order, index) =>
 			toProfileOrder(order, orderItemsByOrder[index] ?? []),
 		);
 	} catch {

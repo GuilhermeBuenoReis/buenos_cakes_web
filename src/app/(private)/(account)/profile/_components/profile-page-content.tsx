@@ -33,7 +33,7 @@ export function ProfilePageContent({
 
 				<div className="space-y-6">
 					<ProfilePersonalInfoCard customer={customer} userId={userId} />
-					<ProfileRecentOrders orders={orders} />
+					<ProfileRecentOrders customerEmail={customer.email} orders={orders} />
 					<ProfileAddressesCard addresses={addresses} userId={userId} />
 				</div>
 			</div>

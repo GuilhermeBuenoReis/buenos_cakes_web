@@ -11,31 +11,46 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 import { buildPaginationItems } from "@/lib/build-pagination-items";
-import { useProductsCatalog } from "../_context/products-catalog-context";
 
-export function ProductsPagination() {
-	const { currentPage, setCurrentPage, totalPages } = useProductsCatalog();
+interface ProfileOrdersPaginationProps {
+	currentPage: number;
+	onPageChange: (nextPage: number) => void;
+	totalPages: number;
+}
+
+export function ProfileOrdersPagination({
+	currentPage,
+	onPageChange,
+	totalPages,
+}: ProfileOrdersPaginationProps) {
 	const pageItems = buildPaginationItems(currentPage, totalPages);
 
 	function handlePreviousPageClick(event: MouseEvent<HTMLAnchorElement>) {
 		event.preventDefault();
-		if (currentPage > 1) setCurrentPage(currentPage - 1);
+		if (currentPage > 1) {
+			onPageChange(currentPage - 1);
+		}
 	}
 
 	function handleNextPageClick(event: MouseEvent<HTMLAnchorElement>) {
 		event.preventDefault();
-		if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+		if (currentPage < totalPages) {
+			onPageChange(currentPage + 1);
+		}
 	}
 
 	function handlePageItemClick(event: MouseEvent<HTMLAnchorElement>) {
 		event.preventDefault();
 		const nextPage = Number(event.currentTarget.dataset.page);
-		if (!Number.isFinite(nextPage)) return;
-		setCurrentPage(nextPage);
+		if (!Number.isFinite(nextPage)) {
+			return;
+		}
+
+		onPageChange(nextPage);
 	}
 
 	return (
-		<Pagination className="pt-1.5">
+		<Pagination className="mt-6 justify-end">
 			<PaginationContent>
 				<PaginationItem>
 					<PaginationPrevious
@@ -61,7 +76,7 @@ export function ProductsPagination() {
 								size="icon-sm"
 								className={
 									item === currentPage
-										? "border-rose-500 bg-rose-500 text-white hover:bg-rose-500 hover:text-white shadow-sm"
+										? "border-rose-500 bg-rose-500 text-white shadow-sm hover:bg-rose-500 hover:text-white"
 										: "border-rose-100 bg-white hover:border-rose-200 hover:bg-rose-50"
 								}
 								onClick={handlePageItemClick}

@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchProductById } from "@/api/backend/routes/fetch-product-by-id";
-import { listOrderItemsByOrder } from "@/api/backend/routes/list-order-items-by-order";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import {
+	type OrderDetailItem,
+	orderDetailItemsQueryOptions,
+	profileOrderQueryKeys,
+} from "../_queries/order-details";
 
-export interface OrderDetailItem {
-	id: string;
-	note?: string | null;
-	productName: string;
-	quantity: number;
-	total: number;
-	unitPrice: number;
-}
+export type { OrderDetailItem };
 
 interface UseOrderDetailsParams {
 	isOpen: boolean;
@@ -19,78 +16,28 @@ interface UseOrderDetailsParams {
 }
 
 export function useOrderDetails({ isOpen, orderId }: UseOrderDetailsParams) {
-	const [items, setItems] = useState<OrderDetailItem[]>([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const queryClient = useQueryClient();
+	const query = useQuery({
+		...orderDetailItemsQueryOptions(orderId),
+		enabled: isOpen && Boolean(orderId),
+	});
 
-	useEffect(() => {
-		if (!isOpen || !orderId) {
+	const reload = useCallback(() => {
+		if (!orderId) {
 			return;
 		}
 
-		let cancelled = false;
-		setLoading(true);
-		setError(null);
-		setItems([]);
+		void queryClient.invalidateQueries({
+			queryKey: profileOrderQueryKeys.items(orderId),
+		});
+	}, [orderId, queryClient]);
 
-		async function fetchDetails(currentOrderId: string) {
-			try {
-				const { orderItems } = await listOrderItemsByOrder({
-					orderId: currentOrderId,
-				});
-
-				if (cancelled) {
-					return;
-				}
-
-				const enriched = await Promise.all(
-					orderItems.map(async (item) => {
-						try {
-							const { product } = await fetchProductById({
-								productId: item.productId,
-							});
-
-							return {
-								id: item.id,
-								note: item.note,
-								productName: product.name,
-								quantity: item.quantity,
-								total: item.total,
-								unitPrice: item.unitPrice,
-							};
-						} catch {
-							return {
-								id: item.id,
-								note: item.note,
-								productName: `Produto ${item.productId.slice(0, 8)}…`,
-								quantity: item.quantity,
-								total: item.total,
-								unitPrice: item.unitPrice,
-							};
-						}
-					}),
-				);
-
-				if (!cancelled) {
-					setItems(enriched);
-				}
-			} catch {
-				if (!cancelled) {
-					setError("Não foi possível carregar os itens do pedido.");
-				}
-			} finally {
-				if (!cancelled) {
-					setLoading(false);
-				}
-			}
-		}
-
-		fetchDetails(orderId);
-
-		return () => {
-			cancelled = true;
-		};
-	}, [isOpen, orderId]);
-
-	return { error, items, loading };
+	return {
+		error: query.isError
+			? "Não foi possível carregar os itens do pedido."
+			: null,
+		items: query.data ?? [],
+		loading: query.isLoading,
+		reload,
+	};
 }
