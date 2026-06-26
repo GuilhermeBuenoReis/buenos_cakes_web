@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { authenticateUser } from "@/api/backend/auth";
 import { getBackendErrorMessage } from "@/api/backend/errors";
-import { GoogleSvg } from "@/components/ui/google-svg";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -23,7 +22,6 @@ import {
 	FieldError,
 	FieldGroup,
 	FieldLabel,
-	FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { persistAuthSession } from "@/lib/auth/browser-session";
@@ -87,20 +85,11 @@ export function SignInForm({
 			<Card>
 				<CardHeader className="text-center">
 					<CardTitle className="text-xl">Bem-vindo de volta</CardTitle>
-					<CardDescription>Entre com sua conta ou com o Google</CardDescription>
+					<CardDescription>Entre com sua conta</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form noValidate onSubmit={handleSubmit(handleSignInSubmit)}>
 						<FieldGroup>
-							<Field>
-								<Button variant="outline" type="button">
-									<GoogleSvg />
-									Entrar com Google
-								</Button>
-							</Field>
-							<FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-								Ou continue com
-							</FieldSeparator>
 							<Field>
 								<FieldLabel htmlFor="email">E-mail</FieldLabel>
 								<Input

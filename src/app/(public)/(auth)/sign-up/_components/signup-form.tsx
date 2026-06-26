@@ -8,15 +8,20 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { type CreateUserRequestInput, createUser } from "@/api/backend/auth";
 import { getBackendErrorMessage } from "@/api/backend/errors";
-import { GoogleSvg } from "@/components/ui/google-svg";
 import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import {
 	Field,
 	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
-	FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -59,7 +64,7 @@ const defaultSignUpFormValues: SignUpFormValues = {
 export function SignupForm({
 	className,
 	...props
-}: React.ComponentProps<"form">) {
+}: React.ComponentProps<"div">) {
 	const router = useRouter();
 	const {
 		formState: { errors },
@@ -97,94 +102,97 @@ export function SignupForm({
 	}
 
 	return (
-		<form
-			className={cn("flex flex-col gap-6", className)}
-			noValidate
-			onSubmit={handleSubmit(handleSignUpSubmit)}
-			{...props}
-		>
-			<FieldGroup>
-				<div className="flex flex-col items-center gap-1 text-center">
-					<h1 className="text-2xl font-bold">Crie sua conta</h1>
-					<p className="text-sm text-balance text-muted-foreground">
+		<div className={cn("flex flex-col gap-6", className)} {...props}>
+			<Card>
+				<CardHeader className="text-center">
+					<CardTitle className="text-xl">Crie sua conta</CardTitle>
+					<CardDescription>
 						Preencha os dados abaixo para criar sua conta
-					</p>
-				</div>
-				<Field>
-					<FieldLabel htmlFor="name">Nome completo</FieldLabel>
-					<Input
-						aria-invalid={Boolean(errors.name)}
-						autoComplete="name"
-						id="name"
-						placeholder="João da Silva"
-						type="text"
-						{...register("name")}
-						required
-					/>
-					<FieldError errors={[errors.name]} />
-				</Field>
-				<Field>
-					<FieldLabel htmlFor="email">E-mail</FieldLabel>
-					<Input
-						aria-invalid={Boolean(errors.email)}
-						autoComplete="email"
-						id="email"
-						placeholder="voce@exemplo.com"
-						type="email"
-						{...register("email")}
-						required
-					/>
-					<FieldDescription>
-						Usaremos este e-mail para entrar em contato com você. Não
-						compartilharemos seu e-mail com terceiros.
-					</FieldDescription>
-					<FieldError errors={[errors.email]} />
-				</Field>
-				<Field>
-					<FieldLabel htmlFor="password">Senha</FieldLabel>
-					<Input
-						aria-invalid={Boolean(errors.password)}
-						autoComplete="new-password"
-						id="password"
-						type="password"
-						{...register("password")}
-						required
-					/>
-					<FieldDescription>Deve ter pelo menos 8 caracteres.</FieldDescription>
-					<FieldError errors={[errors.password]} />
-				</Field>
-				<Field>
-					<FieldLabel htmlFor="confirm-password">Confirmar senha</FieldLabel>
-					<Input
-						aria-invalid={Boolean(errors.confirmPassword)}
-						autoComplete="new-password"
-						id="confirm-password"
-						type="password"
-						{...register("confirmPassword")}
-						required
-					/>
-					<FieldDescription>Confirme sua senha.</FieldDescription>
-					<FieldError errors={[errors.confirmPassword]} />
-				</Field>
-				<Field>
-					<Button disabled={signUpMutation.isPending} type="submit">
-						{signUpMutation.isPending ? "Criando conta..." : "Criar conta"}
-					</Button>
-					{signUpError ? (
-						<FieldError errors={[{ message: signUpError }]} />
-					) : null}
-				</Field>
-				<FieldSeparator>Ou continue com</FieldSeparator>
-				<Field>
-					<Button variant="outline" type="button">
-						<GoogleSvg />
-						Criar conta com Google
-					</Button>
-					<FieldDescription className="px-6 text-center">
-						Já tem uma conta? <Link href="/sign-in">Entrar</Link>
-					</FieldDescription>
-				</Field>
-			</FieldGroup>
-		</form>
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form noValidate onSubmit={handleSubmit(handleSignUpSubmit)}>
+						<FieldGroup>
+							<Field>
+								<FieldLabel htmlFor="name">Nome completo</FieldLabel>
+								<Input
+									aria-invalid={Boolean(errors.name)}
+									autoComplete="name"
+									id="name"
+									placeholder="João da Silva"
+									type="text"
+									{...register("name")}
+									required
+								/>
+								<FieldError errors={[errors.name]} />
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="email">E-mail</FieldLabel>
+								<Input
+									aria-invalid={Boolean(errors.email)}
+									autoComplete="email"
+									id="email"
+									placeholder="voce@exemplo.com"
+									type="email"
+									{...register("email")}
+									required
+								/>
+								<FieldDescription>
+									Usaremos este e-mail para entrar em contato com você. Não
+									compartilharemos seu e-mail com terceiros.
+								</FieldDescription>
+								<FieldError errors={[errors.email]} />
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="password">Senha</FieldLabel>
+								<Input
+									aria-invalid={Boolean(errors.password)}
+									autoComplete="new-password"
+									id="password"
+									type="password"
+									{...register("password")}
+									required
+								/>
+								<FieldDescription>
+									Deve ter pelo menos 8 caracteres.
+								</FieldDescription>
+								<FieldError errors={[errors.password]} />
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="confirm-password">
+									Confirmar senha
+								</FieldLabel>
+								<Input
+									aria-invalid={Boolean(errors.confirmPassword)}
+									autoComplete="new-password"
+									id="confirm-password"
+									type="password"
+									{...register("confirmPassword")}
+									required
+								/>
+								<FieldDescription>Confirme sua senha.</FieldDescription>
+								<FieldError errors={[errors.confirmPassword]} />
+							</Field>
+							<Field>
+								<Button disabled={signUpMutation.isPending} type="submit">
+									{signUpMutation.isPending ? "Criando conta..." : "Criar conta"}
+								</Button>
+								{signUpError ? (
+									<FieldError errors={[{ message: signUpError }]} />
+								) : null}
+								<FieldDescription className="text-center">
+									Já tem uma conta? <Link href="/sign-in">Entrar</Link>
+								</FieldDescription>
+							</Field>
+						</FieldGroup>
+					</form>
+				</CardContent>
+			</Card>
+			<FieldDescription className="px-6 text-center">
+				Ao continuar, você concorda com nossos{" "}
+				<Link href="#">Termos de Serviço</Link> e{" "}
+				<Link href="#">Política de Privacidade</Link>.
+			</FieldDescription>
+		</div>
 	);
 }

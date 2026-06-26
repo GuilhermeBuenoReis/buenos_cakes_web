@@ -1,4 +1,3 @@
-import { GalleryVerticalEnd } from "lucide-react";
 import Link from "next/link";
 import { SignupForm } from "./_components/signup-form";
 
@@ -10,10 +9,10 @@ export default function SignupPage() {
 					href="/dashboard"
 					className="flex items-center gap-2 self-center font-medium"
 				>
-					<div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-						<GalleryVerticalEnd className="size-4" />
+					<div className="text-3xl leading-none font-bold tracking-tight">
+						<span className="text-[#1f2937]">Doce</span>
+						<span className="text-[#ff4b61]">Gestão</span>
 					</div>
-					Buenos'Cakes
 				</Link>
 				<SignupForm />
 			</div>

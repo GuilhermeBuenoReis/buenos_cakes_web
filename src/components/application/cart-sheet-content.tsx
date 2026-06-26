@@ -42,7 +42,7 @@ export function CartSheetContent() {
 		<SheetContent
 			side="right"
 			showCloseButton={false}
-			className="w-[88vw] max-w-90 gap-0 border-l border-l-[#6f63ff] bg-[#fffefe] p-0 shadow-[-14px_0_34px_rgba(31,41,55,0.12)] sm:w-93 sm:max-w-93"
+			className="w-screen max-w-96 gap-0 border-l border-l-[#6f63ff] bg-[#fffefe] p-0 shadow-[-14px_0_34px_rgba(31,41,55,0.12)] sm:w-108 sm:max-w-108"
 		>
 			<div className="flex h-full flex-col">
 				<SheetHeader className="border-b border-slate-100 bg-white px-5 pb-4 pt-5 sm:px-6">

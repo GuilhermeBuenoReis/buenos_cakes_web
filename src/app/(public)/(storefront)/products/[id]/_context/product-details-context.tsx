@@ -13,83 +13,12 @@ import type {
 	ProductSizeOption,
 } from "@/api/products/types";
 
-const fallbackSizeOptions: ProductSizeOption[] = [
-	{
-		code: "pequeno",
-		id: "pequeno",
-		isDefault: true,
-		label: "Pequeno",
-		priceDelta: 0,
-		servings: "Serve 4-6",
-		sortOrder: 1,
-	},
-	{
-		code: "medio",
-		id: "medio",
-		isDefault: false,
-		label: "Medio",
-		priceDelta: 0,
-		servings: "Serve 8-10",
-		sortOrder: 2,
-	},
-	{
-		code: "grande",
-		id: "grande",
-		isDefault: false,
-		label: "Grande",
-		priceDelta: 0,
-		servings: "Serve 12-15",
-		sortOrder: 3,
-	},
-];
-
 function clampQuantity(quantity: number) {
 	return Math.max(1, quantity);
 }
 
 function clampMessage(message: string) {
 	return message.slice(0, 50);
-}
-
-function getFallbackFillingsForCategory(
-	category: string,
-): ProductFillingOption[] {
-	if (category === "Bolos") {
-		return [
-			"Creme de Baunilha (Padrao)",
-			"Brigadeiro Cremoso",
-			"Morango com Chantilly",
-		].map(toFallbackFillingOption);
-	}
-
-	if (category === "Tortas") {
-		return ["Creme Citrico (Padrao)", "Ganache Leve", "Frutas Vermelhas"].map(
-			toFallbackFillingOption,
-		);
-	}
-
-	if (category === "Cookies") {
-		return ["Chocolate Intenso", "Doce de Leite", "Pistache"].map(
-			toFallbackFillingOption,
-		);
-	}
-
-	return ["Receita da Casa", "Chocolate Belga", "Baunilha Premium"].map(
-		toFallbackFillingOption,
-	);
-}
-
-function toFallbackFillingOption(
-	label: string,
-	index: number,
-): ProductFillingOption {
-	return {
-		id: label,
-		isDefault: index === 0,
-		label,
-		priceDelta: 0,
-		sortOrder: index + 1,
-	};
 }
 
 function getDefaultOptionId<TOption extends { id: string; isDefault: boolean }>(
@@ -104,9 +33,10 @@ interface ProductDetailsContextValue {
 	message: string;
 	product: Product;
 	quantity: number;
-	selectedFilling: ProductFillingOption;
+	selectedFilling: ProductFillingOption | null;
 	selectedFillingId: string;
-	selectedSize: ProductSizeOption;
+	selectedFillingLabel: string;
+	selectedSize: ProductSizeOption | null;
 	selectedSizeId: string;
 	selectedSizeLabel: string;
 	selectedUnitPrice: number;
@@ -132,18 +62,8 @@ export function ProductDetailsProvider({
 	product,
 	relatedImages,
 }: ProductDetailsProviderProps) {
-	const fillings = useMemo(() => {
-		const productFillings = product.fillings ?? [];
-
-		return productFillings.length > 0
-			? productFillings
-			: getFallbackFillingsForCategory(product.category);
-	}, [product.category, product.fillings]);
-	const sizeOptions = useMemo(() => {
-		const productSizes = product.sizes ?? [];
-
-		return productSizes.length > 0 ? productSizes : [...fallbackSizeOptions];
-	}, [product.sizes]);
+	const fillings = useMemo(() => product.fillings ?? [], [product.fillings]);
+	const sizeOptions = useMemo(() => product.sizes ?? [], [product.sizes]);
 	const defaultFillingId = getDefaultOptionId(fillings);
 	const defaultSizeId = getDefaultOptionId(sizeOptions);
 	const [customization, setCustomization] = useQueryStates({
@@ -158,10 +78,12 @@ export function ProductDetailsProvider({
 	const fullStars = Math.round(product.rating);
 	const selectedSizeOption =
 		sizeOptions.find((size) => size.id === customization.size) ??
-		sizeOptions[0];
+		sizeOptions[0] ??
+		null;
 	const selectedFillingOption =
 		fillings.find((filling) => filling.id === customization.filling) ??
-		fillings[0];
+		fillings[0] ??
+		null;
 	const quantity = clampQuantity(customization.quantity);
 	const message = clampMessage(customization.message);
 	const selectedUnitPrice =
@@ -213,6 +135,7 @@ export function ProductDetailsProvider({
 		quantity,
 		selectedFilling: selectedFillingOption,
 		selectedFillingId: selectedFillingOption?.id ?? "",
+		selectedFillingLabel: selectedFillingOption?.label ?? "",
 		selectedSize: selectedSizeOption,
 		selectedSizeId: selectedSizeOption?.id ?? "",
 		selectedSizeLabel: selectedSizeOption?.label ?? "",

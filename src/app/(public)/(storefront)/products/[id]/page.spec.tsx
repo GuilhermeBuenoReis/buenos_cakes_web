@@ -35,6 +35,26 @@ const baseProduct: Product = {
 	price: 145.9,
 	rating: 4.8,
 	reviews: 48,
+	sizes: [
+		{
+			code: "BOLO_PP",
+			id: "size_pp",
+			isDefault: true,
+			label: "Pequeno",
+			priceDelta: 0,
+			servings: "Serve 4-6",
+			sortOrder: 1,
+		},
+		{
+			code: "BOLO_M",
+			id: "size_m",
+			isDefault: false,
+			label: "Medio",
+			priceDelta: 20,
+			servings: "Serve 8-10",
+			sortOrder: 2,
+		},
+	],
 };
 
 describe("ProductDetailsPage", () => {

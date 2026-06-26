@@ -26,7 +26,6 @@ describe("Auth", () => {
 	it("validates sign-in and navigates to sign-up", () => {
 		cy.visit("/sign-in");
 		cy.contains("Bem-vindo de volta").should("be.visible");
-		cy.contains("button", "Entrar com Google").should("be.visible");
 
 		cy.contains("button", /^Entrar$/).click();
 

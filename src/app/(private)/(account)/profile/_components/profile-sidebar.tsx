@@ -3,6 +3,7 @@
 import { LogOut, MapPin, Package2, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useSignOut } from "../_hooks/use-sign-out";
 import {
 	defaultProfileCustomer,
 	getProfileInitials,
@@ -37,6 +38,8 @@ interface ProfileSidebarProps {
 export function ProfileSidebar({
 	customer = defaultProfileCustomer,
 }: ProfileSidebarProps) {
+	const { signOut } = useSignOut();
+
 	return (
 		<aside className="rounded-[2rem] border border-white/70 bg-white/92 p-5 shadow-[0_28px_70px_-50px_rgba(15,23,42,0.18)] backdrop-blur-sm sm:p-6">
 			<div className="flex items-center gap-3">
@@ -81,10 +84,8 @@ export function ProfileSidebar({
 
 			<div className="mt-6 border-t border-[#efe7e7] pt-5">
 				<button
-					aria-disabled="true"
-					className="flex w-full items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold text-rose-500 opacity-80"
-					disabled
-					title="A saída da conta será conectada quando o fluxo de autenticação estiver pronto."
+					className="flex w-full items-center gap-3 rounded-full px-4 py-3 text-sm font-semibold text-rose-500 transition hover:bg-[#fff5f6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200"
+					onClick={signOut}
 					type="button"
 				>
 					<LogOut className="size-4" />

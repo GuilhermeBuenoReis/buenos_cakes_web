@@ -31,7 +31,9 @@ export function ProductBreadcrumb() {
 				<BreadcrumbSeparator className="text-rose-300" />
 				<BreadcrumbItem>
 					<BreadcrumbPage className="font-semibold text-rose-500">
-						{product.name} - {selectedSizeLabel}
+						{selectedSizeLabel
+							? `${product.name} - ${selectedSizeLabel}`
+							: product.name}
 					</BreadcrumbPage>
 				</BreadcrumbItem>
 			</BreadcrumbList>
