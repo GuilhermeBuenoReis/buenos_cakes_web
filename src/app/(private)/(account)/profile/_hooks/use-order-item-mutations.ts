@@ -21,17 +21,25 @@ export type RemoveOrderItemVariables = Omit<
 	"orderId"
 >;
 
+function invalidateOrderQueries(
+	queryClient: ReturnType<typeof useQueryClient>,
+	orderId: string,
+) {
+	void queryClient.invalidateQueries({
+		queryKey: profileOrderQueryKeys.detail(orderId),
+	});
+	void queryClient.invalidateQueries({
+		queryKey: profileOrderQueryKeys.items(orderId),
+	});
+}
+
 export function useAddOrderItemMutation(orderId: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: (variables: AddOrderItemVariables) =>
 			addOrderItem({ ...variables, orderId }),
-		onSuccess: () => {
-			void queryClient.invalidateQueries({
-				queryKey: profileOrderQueryKeys.items(orderId),
-			});
-		},
+		onSuccess: () => invalidateOrderQueries(queryClient, orderId),
 	});
 }
 
@@ -41,11 +49,7 @@ export function useChangeOrderItemMutation(orderId: string) {
 	return useMutation({
 		mutationFn: (variables: ChangeOrderItemVariables) =>
 			changeOrderItem({ ...variables, orderId }),
-		onSuccess: () => {
-			void queryClient.invalidateQueries({
-				queryKey: profileOrderQueryKeys.items(orderId),
-			});
-		},
+		onSuccess: () => invalidateOrderQueries(queryClient, orderId),
 	});
 }
 
@@ -55,10 +59,6 @@ export function useRemoveOrderItemMutation(orderId: string) {
 	return useMutation({
 		mutationFn: (variables: RemoveOrderItemVariables) =>
 			removeOrderItem({ ...variables, orderId }),
-		onSuccess: () => {
-			void queryClient.invalidateQueries({
-				queryKey: profileOrderQueryKeys.items(orderId),
-			});
-		},
+		onSuccess: () => invalidateOrderQueries(queryClient, orderId),
 	});
 }
