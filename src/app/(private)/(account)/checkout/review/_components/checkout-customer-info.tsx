@@ -39,19 +39,19 @@ export function CheckoutCustomerInfo({ customer }: CheckoutCustomerInfoProps) {
 			<div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
 				<div className="rounded-[1.5rem] border border-[#ece4e4] bg-[#fffdfb] p-4 shadow-[0_16px_32px_-28px_rgba(15,23,42,0.14)]">
 					<p className="text-sm font-semibold text-slate-600">Nome</p>
-					<p className="mt-2 text-base font-extrabold leading-7 text-slate-950">
+					<p className="mt-2 wrap-break-word text-base font-extrabold leading-7 text-slate-950">
 						{customer.fullName || "Não informado"}
 					</p>
 				</div>
 				<div className="rounded-[1.5rem] border border-[#ece4e4] bg-[#fffdfb] p-4 shadow-[0_16px_32px_-28px_rgba(15,23,42,0.14)]">
 					<p className="text-sm font-semibold text-slate-600">E-mail</p>
-					<p className="mt-2 text-base font-extrabold leading-7 text-slate-950">
+					<p className="mt-2 wrap-break-word text-base font-extrabold leading-7 text-slate-950">
 						{customer.email || "Não informado"}
 					</p>
 				</div>
 				<div className="rounded-[1.5rem] border border-[#ece4e4] bg-[#fffdfb] p-4 shadow-[0_16px_32px_-28px_rgba(15,23,42,0.14)] sm:col-span-2 xl:col-span-1">
 					<p className="text-sm font-semibold text-slate-600">Telefone</p>
-					<p className="mt-2 text-base font-extrabold leading-7 text-slate-950">
+					<p className="mt-2 wrap-break-word text-base font-extrabold leading-7 text-slate-950">
 						{customer.phone || "Não informado"}
 					</p>
 				</div>
