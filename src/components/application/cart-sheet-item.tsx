@@ -49,10 +49,10 @@ export function CartSheetItem({ item }: CartSheetItemProps) {
 					<button
 						type="button"
 						aria-label={`Remover ${item.name} do carrinho`}
-						className="rounded-full p-0.5 text-slate-300 transition hover:bg-slate-50 hover:text-slate-500"
+						className="flex size-8 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200"
 						onClick={handleRemoveItemClick}
 					>
-						<Trash2 className="size-3" />
+						<Trash2 className="size-4" />
 					</button>
 				</div>
 

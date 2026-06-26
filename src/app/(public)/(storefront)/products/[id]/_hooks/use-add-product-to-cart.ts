@@ -9,8 +9,8 @@ export function useAddProductToCart() {
 		message,
 		product,
 		quantity,
-		selectedFilling,
 		selectedFillingId,
+		selectedFillingLabel,
 		selectedSizeId,
 		selectedSizeLabel,
 		selectedUnitPrice,
@@ -18,7 +18,9 @@ export function useAddProductToCart() {
 
 	function addProductToCart() {
 		const trimmedMessage = message.trim();
-		const highlightParts = [selectedSizeLabel, selectedFilling.label];
+		const highlightParts = [selectedSizeLabel, selectedFillingLabel].filter(
+			Boolean,
+		);
 
 		if (trimmedMessage) {
 			highlightParts.push("Com mensagem");

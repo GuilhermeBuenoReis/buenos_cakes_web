@@ -41,8 +41,8 @@ export function Navbar() {
 			<div className="flex items-center justify-between gap-4">
 				<Link href="/dashboard" className="flex items-center gap-2.5">
 					<div className="text-lg leading-none font-bold tracking-tight">
-						<span className="text-[#1f2937]">Buenos</span>
-						<span className="text-[#ff4b61]">Cakes</span>
+						<span className="text-[#1f2937]">Doce</span>
+						<span className="text-[#ff4b61]">Gestão</span>
 					</div>
 				</Link>
 

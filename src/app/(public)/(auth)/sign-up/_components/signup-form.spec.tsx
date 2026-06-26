@@ -60,7 +60,7 @@ describe("SignupForm", () => {
 			"password",
 		);
 		expect(
-			screen.getByRole("button", { name: "Criar conta com Google" }),
+			screen.getByRole("button", { name: "Criar conta" }),
 		).toBeVisible();
 		expect(screen.getByRole("link", { name: "Entrar" })).toHaveAttribute(
 			"href",

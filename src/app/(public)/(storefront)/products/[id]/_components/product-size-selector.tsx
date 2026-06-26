@@ -6,6 +6,10 @@ import { useProductDetails } from "../_context/product-details-context";
 export function ProductSizeSelector() {
 	const { product, selectedSizeId, setSize, sizeOptions } = useProductDetails();
 
+	if (sizeOptions.length === 0) {
+		return null;
+	}
+
 	return (
 		<div className="space-y-2.5">
 			<p className="text-[11px] font-extrabold tracking-[0.12em] text-rose-400 uppercase">

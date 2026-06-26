@@ -13,6 +13,10 @@ import { useProductDetails } from "../_context/product-details-context";
 export function ProductFillingSelector() {
 	const { fillings, selectedFillingId, setFilling } = useProductDetails();
 
+	if (fillings.length === 0) {
+		return null;
+	}
+
 	return (
 		<div className="space-y-2.5">
 			<p className="text-[11px] font-extrabold tracking-[0.12em] text-rose-400 uppercase">

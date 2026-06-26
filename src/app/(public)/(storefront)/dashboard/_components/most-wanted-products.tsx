@@ -32,11 +32,16 @@ export function MostWantedProducts() {
 			{hasProducts ? (
 				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 					{products.map((product) => (
-						<article className="space-y-2" key={product.id}>
+						<Link
+							aria-label={`Ver detalhes de ${product.name}`}
+							className="group block space-y-2 rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+							href={`/products/${product.id}`}
+							key={product.id}
+						>
 							<div className="relative h-40 overflow-hidden rounded-[20px] bg-slate-100 sm:h-44">
 								<Image
 									alt={product.name}
-									className="h-full w-full object-cover transition duration-500 hover:scale-105"
+									className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 									fill
 									sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
 									src={product.image}
@@ -57,14 +62,14 @@ export function MostWantedProducts() {
 									<span>({product.ratingCount})</span>
 								</div>
 
-								<h3 className="text-sm font-semibold tracking-tight text-slate-900 sm:text-sm">
+								<h3 className="text-sm font-semibold tracking-tight text-slate-900 transition group-hover:text-rose-600 sm:text-sm">
 									{product.name}
 								</h3>
 								<p className="text-sm font-semibold tracking-tight text-rose-500 sm:text-lg">
 									{formatPrice(product.price)}
 								</p>
 							</div>
-						</article>
+						</Link>
 					))}
 				</div>
 			) : (

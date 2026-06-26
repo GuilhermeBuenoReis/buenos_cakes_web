@@ -1,8 +1,26 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { userEvent } from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ProfileSidebar } from "./profile-sidebar";
 
+const mocks = vi.hoisted(() => ({
+	clearAuthSession: vi.fn(),
+	navigateToPath: vi.fn(),
+}));
+
+vi.mock("@/lib/auth/browser-session", () => ({
+	clearAuthSession: mocks.clearAuthSession,
+}));
+
+vi.mock("@/lib/client-navigation", () => ({
+	navigateToPath: mocks.navigateToPath,
+}));
+
 describe("ProfileSidebar", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
 	it("renders the customer summary and sidebar navigation", () => {
 		render(<ProfileSidebar />);
 
@@ -21,6 +39,17 @@ describe("ProfileSidebar", () => {
 			"href",
 			"#profile-addresses",
 		);
-		expect(screen.getByRole("button", { name: "Sair" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Sair" })).toBeEnabled();
+	});
+
+	it("clears the session and redirects to sign-in when signing out", async () => {
+		const user = userEvent.setup();
+
+		render(<ProfileSidebar />);
+
+		await user.click(screen.getByRole("button", { name: "Sair" }));
+
+		expect(mocks.clearAuthSession).toHaveBeenCalledTimes(1);
+		expect(mocks.navigateToPath).toHaveBeenCalledWith("/sign-in");
 	});
 });
