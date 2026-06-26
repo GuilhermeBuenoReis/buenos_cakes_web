@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { type CreateUserRequestInput, createUser } from "@/api/backend/auth";
 import { getBackendErrorMessage } from "@/api/backend/errors";
-import { GoogleSvg } from "@/components/google-svg";
+import { GoogleSvg } from "@/components/ui/google-svg";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
