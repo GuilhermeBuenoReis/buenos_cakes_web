@@ -111,7 +111,7 @@ http://localhost:3333
 No navegador, as chamadas usam o rewrite do Next.js:
 
 ```bash
-/backend-api/* -> http://localhost:3333/*
+/backend-api/* -> http://localhost:3333/
 ```
 
 Esse comportamento está configurado em `next.config.ts`.
