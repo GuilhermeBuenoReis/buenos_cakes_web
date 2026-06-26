@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useDashboardCategories } from "../_hooks/use-dashboard-catalog";
 
 export function CategoriesShowcase() {
@@ -19,8 +20,10 @@ export function CategoriesShowcase() {
 			{hasCategories ? (
 				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 					{categories.map((card) => (
-						<article
-							className="group relative h-44 overflow-hidden rounded-[24px] bg-slate-100 sm:h-48"
+						<Link
+							aria-label={`Ver produtos da categoria ${card.title}`}
+							className="group relative block h-44 overflow-hidden rounded-[24px] bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 sm:h-48"
+							href={`/products?category=${encodeURIComponent(card.title)}`}
 							key={card.id}
 						>
 							<Image
@@ -40,7 +43,7 @@ export function CategoriesShowcase() {
 									{card.subtitle}
 								</p>
 							</div>
-						</article>
+						</Link>
 					))}
 				</div>
 			) : (
